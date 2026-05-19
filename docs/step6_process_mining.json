@@ -1,0 +1,236 @@
+{
+  "process_mining": {
+    "n_cases_with_traces": 5000,
+    "n_unique_variants": 4430,
+    "top_variants": [
+      {
+        "variant": "complaint > motion > order",
+        "count": 33
+      },
+      {
+        "variant": "complaint > motion > order > order",
+        "count": 19
+      },
+      {
+        "variant": "complaint > summons > notice > minute_entry",
+        "count": 18
+      },
+      {
+        "variant": "complaint > order",
+        "count": 15
+      },
+      {
+        "variant": "complaint > summons > minute_entry > notice > minute_entry",
+        "count": 15
+      },
+      {
+        "variant": "complaint > summons > summons > minute_entry > notice > minute_entry",
+        "count": 13
+      },
+      {
+        "variant": "complaint > motion > minute_entry",
+        "count": 12
+      },
+      {
+        "variant": "complaint > minute_entry > order",
+        "count": 11
+      },
+      {
+        "variant": "order > order",
+        "count": 11
+      },
+      {
+        "variant": "complaint > motion > minute_entry > minute_entry",
+        "count": 11
+      },
+      {
+        "variant": "complaint > notice > minute_entry",
+        "count": 10
+      },
+      {
+        "variant": "complaint > summons > summons > notice > minute_entry",
+        "count": 10
+      },
+      {
+        "variant": "complaint > minute_entry > motion > order",
+        "count": 9
+      },
+      {
+        "variant": "order",
+        "count": 9
+      },
+      {
+        "variant": "complaint > order > order",
+        "count": 9
+      }
+    ],
+    "top_transitions": [
+      {
+        "from": "minute_entry",
+        "to": "minute_entry",
+        "count": 17943
+      },
+      {
+        "from": "motion",
+        "to": "notice",
+        "count": 12714
+      },
+      {
+        "from": "notice",
+        "to": "minute_entry",
+        "count": 11974
+      },
+      {
+        "from": "minute_entry",
+        "to": "motion",
+        "count": 8471
+      },
+      {
+        "from": "minute_entry",
+        "to": "order",
+        "count": 4565
+      },
+      {
+        "from": "notice",
+        "to": "motion",
+        "count": 3365
+      },
+      {
+        "from": "order",
+        "to": "minute_entry",
+        "count": 3123
+      },
+      {
+        "from": "motion",
+        "to": "minute_entry",
+        "count": 2682
+      },
+      {
+        "from": "motion",
+        "to": "order",
+        "count": 2275
+      },
+      {
+        "from": "complaint",
+        "to": "summons",
+        "count": 2219
+      },
+      {
+        "from": "minute_entry",
+        "to": "notice",
+        "count": 2170
+      },
+      {
+        "from": "order",
+        "to": "motion",
+        "count": 2116
+      },
+      {
+        "from": "minute_entry",
+        "to": "response",
+        "count": 2088
+      },
+      {
+        "from": "response",
+        "to": "minute_entry",
+        "count": 1876
+      },
+      {
+        "from": "order",
+        "to": "order",
+        "count": 1858
+      },
+      {
+        "from": "summons",
+        "to": "minute_entry",
+        "count": 1757
+      },
+      {
+        "from": "notice",
+        "to": "notice",
+        "count": 1756
+      },
+      {
+        "from": "minute_entry",
+        "to": "settlement",
+        "count": 1668
+      },
+      {
+        "from": "minute_entry",
+        "to": "answer",
+        "count": 1468
+      },
+      {
+        "from": "motion",
+        "to": "motion",
+        "count": 1415
+      }
+    ],
+    "bottleneck_motion_to_order": {
+      "motion_to_order_n": 16041,
+      "motion_to_order_median_days": 50.0,
+      "motion_to_order_p90_days": 306.0
+    },
+    "sample_cases_requested": 5000
+  },
+  "anomalies": {
+    "n_cases": 151176,
+    "n_anomalies_top1pct": 1512,
+    "residual_threshold_log": 1.8308806904080988,
+    "median_residual_days_anomalies": 1193.3480699562037,
+    "top_judges_by_anomaly_rate": {
+      "SJ000237": 0.03224815724815725,
+      "SJ000212": 0.02176278563656148,
+      "SJ000243": 0.02093358999037536,
+      "SJ000230": 0.019668985368193812,
+      "SJ000205": 0.01545095220984549,
+      "SJ000204": 0.014173228346456693,
+      "SJ000233": 0.013268608414239482,
+      "SJ000250": 0.012873326467559218,
+      "SJ000189": 0.012294182217343578,
+      "SJ000193": 0.011786372007366482
+    },
+    "example_anomalies": [
+      {
+        "ucid": "ilnd;;1:02-cv-05816",
+        "District_Judge": "SJ000243",
+        "los_days": 6827.0,
+        "pred_los": 138.8752905975895,
+        "residual_days": 6688.12470940241,
+        "complexity_index": 0.07766785270192296
+      },
+      {
+        "ucid": "ilnd;;1:03-cv-02712",
+        "District_Judge": "SJ000217",
+        "los_days": 6587.0,
+        "pred_los": 151.98228117743454,
+        "residual_days": 6435.017718822565,
+        "complexity_index": -0.04200443351569424
+      },
+      {
+        "ucid": "ilnd;;3:03-cv-50328",
+        "District_Judge": "SJ000233",
+        "los_days": 6466.0,
+        "pred_los": 192.7349991710182,
+        "residual_days": 6273.265000828982,
+        "complexity_index": 0.1098723133333792
+      },
+      {
+        "ucid": "ilnd;;1:03-cv-01725",
+        "District_Judge": "SJ000203",
+        "los_days": 6463.0,
+        "pred_los": 211.44525129949702,
+        "residual_days": 6251.554748700503,
+        "complexity_index": -0.16384620694166194
+      },
+      {
+        "ucid": "ilnd;;3:03-cv-50363",
+        "District_Judge": "SJ000233",
+        "los_days": 6454.0,
+        "pred_los": 240.44698632954115,
+        "residual_days": 6213.553013670459,
+        "complexity_index": 0.34506056622745956
+      }
+    ]
+  }
+}

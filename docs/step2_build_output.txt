@@ -1,0 +1,5 @@
+Reading /Users/miriam.mantsurova/Desktop/University/Project/Event Log.csv ...
+Wrote 151,640 cases -> /Users/miriam.mantsurova/Desktop/University/Project/data/case_features.parquet
+  closed with LOS: 151,640
+  los_days median: 253
+  complexity_index median: -0.092

@@ -1,0 +1,50 @@
+{
+  "n_train": 120940,
+  "n_test": 30236,
+  "RF_full": {
+    "R2_log_scale": 0.9500262464102529,
+    "MAE_days": 65.94821358107878,
+    "RMSE_days": 146.4427047063287,
+    "top_10_features": {
+      "complexity_index": 0.3700196806665159,
+      "time_gaps_std": 0.2966098412692495,
+      "judge_concurrent_overlap": 0.16709315721192514,
+      "n_events": 0.14125013425516159,
+      "rework_ratio": 0.008373724835832024,
+      "judge_caseload": 0.003972676670640219,
+      "n_notices": 0.0037448938995339833,
+      "activity_entropy": 0.002609761627188141,
+      "n_orders": 0.0013154441667673838,
+      "pro_se_parties": 0.001146075386127056
+    },
+    "importance_by_group": {
+      "case_type": 0.0004530366938128393,
+      "complexity": 0.9990204477997521,
+      "judge": 0.0005265155064351852
+    }
+  },
+  "RF_restricted_no_event_volume": {
+    "R2_log_scale": 0.8556491852643975,
+    "MAE_days": 99.34113819731193,
+    "RMSE_days": 211.55960046305202,
+    "top_10_features": {
+      "complexity_index": 0.4769736882083011,
+      "judge_concurrent_overlap": 0.2977254035724049,
+      "rework_ratio": 0.11291886177972013,
+      "activity_entropy": 0.030606798437505647,
+      "judge_caseload": 0.024324988075834365,
+      "n_activity_types": 0.009765035544889302,
+      "party_load": 0.008387075743427123,
+      "pro_se_parties": 0.00832472984678279,
+      "counsel_load": 0.004603615201971837,
+      "suit_220 Foreclosure": 0.003598389612884299
+    },
+    "importance_by_group": {
+      "case_type": 0.00883940243550249,
+      "complexity": 0.976840250664206,
+      "judge": 0.014320346900291587
+    }
+  },
+  "caveat": "n_events and time_gaps_std are mechanically tied to LOS; prefer RF_restricted for interpretation.",
+  "compare_regression_M3_R2_log": 0.547
+}

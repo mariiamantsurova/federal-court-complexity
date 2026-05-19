@@ -1,0 +1,36 @@
+{
+  "kaplan_meier": {
+    "logrank_p": 0.0,
+    "median_survival_days_by_quartile": {
+      "Q1": 71.0,
+      "Q2": 179.0,
+      "Q3": 355.0,
+      "Q4": 726.0
+    },
+    "n_cases": 157703,
+    "n_events_closed": 151640,
+    "n_censored_open": 6063
+  },
+  "cox_ph": {
+    "n_cases": 144235,
+    "concordance_index": 0.8232327339229175,
+    "hazard_ratios": {
+      "complexity_index": {
+        "HR": 0.14609817311833162,
+        "p": 0.0
+      },
+      "judge_concurrent_overlap": {
+        "HR": 0.9994247884522908,
+        "p": 0.0
+      },
+      "judge_caseload": {
+        "HR": 1.0000651968641836,
+        "p": 0.0
+      },
+      "party_load": {
+        "HR": 1.0704458445413438,
+        "p": 0.0
+      }
+    }
+  }
+}

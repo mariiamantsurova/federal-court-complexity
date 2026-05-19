@@ -1,0 +1,21 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ipynb_checkpoints/
+
+# OS / IDE
+.DS_Store
+.idea/
+.vscode/
+
+# Large data (keep locally; do not push to GitHub)
+Event Log.csv
+data/*.parquet
+data/*.csv
+!data/.gitkeep
+
+# Pipeline logs (optional; regenerate)
+docs/*_run.txt
+docs/extended_pipeline_run.txt
