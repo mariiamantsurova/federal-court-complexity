@@ -1,0 +1,90 @@
+{
+  "case_type": "all",
+  "n_cases": 152102,
+  "models": {
+    "M1_complexity_only": {
+      "formula": "log_los_days ~ z_n_events + z_n_activity_types + z_n_motions + z_activity_entropy",
+      "r2": 0.4241780088542879,
+      "r2_adj": 0.4241628653079683,
+      "n_obs": 152102,
+      "complexity_effects": {
+        "z_n_events": {
+          "coef": 0.1989212931284658,
+          "p_value": 0.009752751922297496,
+          "interpretation": "1 SD increase \u2192 log(LOS) change"
+        },
+        "z_n_activity_types": {
+          "coef": 0.7682616381763824,
+          "p_value": 7.132166983212628e-84,
+          "interpretation": "1 SD increase \u2192 log(LOS) change"
+        },
+        "z_n_motions": {
+          "coef": -0.03362964513314972,
+          "p_value": 0.41976067312763343,
+          "interpretation": "1 SD increase \u2192 log(LOS) change"
+        },
+        "z_activity_entropy": {
+          "coef": 0.075292889102979,
+          "p_value": 0.0007485801395717572,
+          "interpretation": "1 SD increase \u2192 log(LOS) change"
+        }
+      }
+    },
+    "M2_with_case_controls": {
+      "formula": "log_los_days ~ z_n_events + z_n_activity_types + z_n_motions + z_activity_entropy + C(case_type) + C(city) + C(is_mdl)",
+      "r2": 0.4621640306068232,
+      "r2_adj": 0.46213927715313174,
+      "n_obs": 152102,
+      "complexity_effects": {
+        "z_n_events": {
+          "coef": 0.15868145328482508,
+          "p_value": 0.04506698762622746,
+          "interpretation": "1 SD increase \u2192 log(LOS) change"
+        },
+        "z_n_activity_types": {
+          "coef": 0.8281637679912224,
+          "p_value": 2.4000873949273893e-81,
+          "interpretation": "1 SD increase \u2192 log(LOS) change"
+        },
+        "z_n_motions": {
+          "coef": 0.005484592455011372,
+          "p_value": 0.8975296314825743,
+          "interpretation": "1 SD increase \u2192 log(LOS) change"
+        },
+        "z_activity_entropy": {
+          "coef": 0.03757824436624656,
+          "p_value": 0.13218733086189038,
+          "interpretation": "1 SD increase \u2192 log(LOS) change"
+        }
+      }
+    },
+    "M3_with_judge_fe": {
+      "formula": "log_los_days ~ z_n_events + z_n_activity_types + z_n_motions + z_activity_entropy + C(case_type) + C(city) + C(is_mdl) + C(District_Judge)",
+      "r2": 0.4732504297723783,
+      "r2_adj": 0.4730564215778783,
+      "n_obs": 152102,
+      "complexity_effects": {
+        "z_n_events": {
+          "coef": 0.17225343027128728,
+          "p_value": 0.03034095903702212,
+          "interpretation": "1 SD increase \u2192 log(LOS) change"
+        },
+        "z_n_activity_types": {
+          "coef": 0.8336245458608182,
+          "p_value": 2.6523056641358346e-83,
+          "interpretation": "1 SD increase \u2192 log(LOS) change"
+        },
+        "z_n_motions": {
+          "coef": -0.009743768608228762,
+          "p_value": 0.8205233608748129,
+          "interpretation": "1 SD increase \u2192 log(LOS) change"
+        },
+        "z_activity_entropy": {
+          "coef": 0.03054621353026162,
+          "p_value": 0.2186887782348681,
+          "interpretation": "1 SD increase \u2192 log(LOS) change"
+        }
+      }
+    }
+  }
+}

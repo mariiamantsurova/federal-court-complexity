@@ -1,0 +1,89 @@
+{
+  "summary": {
+    "case_type": "all",
+    "n_cases": 175268,
+    "n_closed": 168107,
+    "n_censored": 7161,
+    "pct_censored": 4.09,
+    "median_duration_days": 279.0,
+    "logrank_cv_vs_cr_p": 0.0
+  },
+  "cox_models": [
+    {
+      "label": "Cox_M1_complexity",
+      "n_cases": 175268,
+      "n_events": 168107,
+      "concordance": 0.7481077032791819,
+      "coefficients": [
+        {
+          "term": "z_n_events",
+          "coef": -0.36672647759976346,
+          "exp(coef)": 0.6929991699198791,
+          "p": 1.0234483714559619e-213
+        },
+        {
+          "term": "z_n_activity_types",
+          "coef": -0.44315770817223804,
+          "exp(coef)": 0.6420059495185675,
+          "p": 0.0
+        },
+        {
+          "term": "z_n_motions",
+          "coef": 0.07947102832687865,
+          "exp(coef)": 1.0827141910334157,
+          "p": 1.514073725561808e-17
+        },
+        {
+          "term": "z_activity_entropy",
+          "coef": 0.09930416417337389,
+          "exp(coef)": 1.1044021680492286,
+          "p": 9.416083936893788e-104
+        }
+      ]
+    },
+    {
+      "label": "Cox_M2_with_controls",
+      "n_cases": 175268,
+      "n_events": 168107,
+      "concordance": 0.7754677221682784,
+      "coefficients": [
+        {
+          "term": "z_n_events",
+          "coef": -0.3233703791305177,
+          "exp(coef)": 0.723705759212707,
+          "p": 4.3667746994751117e-135
+        },
+        {
+          "term": "z_n_activity_types",
+          "coef": -0.5469926937225347,
+          "exp(coef)": 0.5786874867198954,
+          "p": 0.0
+        },
+        {
+          "term": "z_n_motions",
+          "coef": -0.1331249205534949,
+          "exp(coef)": 0.8753557353554947,
+          "p": 2.2731403445590116e-36
+        },
+        {
+          "term": "z_activity_entropy",
+          "coef": 0.17017143977187665,
+          "exp(coef)": 1.185508077133676,
+          "p": 5.6366984906939364e-219
+        },
+        {
+          "term": "case_type_cv",
+          "coef": 0.7938638745814207,
+          "exp(coef)": 2.211926542737718,
+          "p": 0.0
+        },
+        {
+          "term": "is_mdl",
+          "coef": -1.7946519298164236,
+          "exp(coef)": 0.16618528642424354,
+          "p": 0.0
+        }
+      ]
+    }
+  ]
+}

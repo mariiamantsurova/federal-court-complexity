@@ -1,0 +1,4 @@
+case_type,n_total,n_mdl,pct_mdl,median_los_all,median_los_mdl,median_los_non_mdl
+all,168107,6700,3.99,267.0,894.0,257.0
+cv,151640,6700,4.42,253.0,894.0,243.0
+cr,16467,0,0.0,550.0,,550.0

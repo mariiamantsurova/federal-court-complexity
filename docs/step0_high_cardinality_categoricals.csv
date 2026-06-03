@@ -1,0 +1,4 @@
+column,dtype,role,n_unique_sample,pct_missing_sample,complexity,suggested_encoding,cardinality_band
+event_judge,object,categorical,1243,0.0,very high,parse judge id → target encoding or embedding (8–32 dim),very high (>500)
+nature_suit,object,categorical,77,0.0,high,"target encoding, feature hashing, or small embedding",high (51–500)
+District_Judge,object,categorical,58,9.84,high,parse judge id → target encoding or embedding (8–32 dim),high (51–500)

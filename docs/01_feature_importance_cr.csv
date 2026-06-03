@@ -1,0 +1,138 @@
+feature,rf_importance,dt_importance
+n_events,0.6822680368906772,0.783085999298195
+activity_entropy,0.045048330512210355,0.01763553767765014
+sum_attribute_notice_of_appeal,0.021323556975489644,0.02932175242305196
+n_motions,0.021235199300129976,0.028159005828050282
+sum_attribute_motion_other,0.01985258070977498,0.009985935644363113
+sum_attribute_notice_of_motion,0.019641148438358944,0.0160077232059433
+sum_attribute_rescheduling,0.018564852504788117,0.006369605756247816
+sum_attribute_hearing_conf,0.0180317939101919,0.008132961263225146
+Defendants_counsels_count,0.0171898010733745,0.008916652213669512
+Defendants_count,0.01599504665534125,0.010671181215082228
+sum_attribute_scheduling,0.014055959234450004,0.005906171960500404
+sum_attribute_dispositive,0.014023084363508572,0.009599744095519587
+Defendants_pending_counts,0.009470267943270038,0.009154602558082684
+n_activity_types,0.009289792325220921,0.009215835500180644
+plaintiffs_counsels_count,0.008030862935261935,0.0025575045579551573
+Defendants_terminated_counts,0.007665321627919946,0.003190149697741416
+sum_attribute_motion_for_time_extension,0.007429051690034092,0.0033094500122594563
+sum_attribute_notice_other,0.0067413886185039235,0.005538575578303286
+Magistrate_Judge_False,0.005191614313582622,0.006801491302068618
+sum_attribute_dismiss_without_prejudice,0.005102723536287093,0.00177663998496522
+Magistrate_Judge_True,0.004990855081304904,0.009252646649729508
+District_Judge_SJ000233,0.004706005677340192,0.0
+sum_attribute_plea_guilty,0.004047047711252791,0.005242580808814796
+District_Judge_None,0.003483095748772458,0.00012371564186038105
+sum_attribute_bilateral_unopposed,0.0033915674112970848,0.005298552024307215
+sum_attribute_trial_jury,0.00212034687181756,0.0028117327722404256
+District_Judge_SJ000207,0.0018209658259014598,0.0
+District_Judge_SJ000193,0.0010876495341457194,0.0019342523299928456
+sum_attribute_proposed,0.0010257636524811256,0.0
+sum_attribute_petition_other,0.0008266712731201851,0.0
+sum_attribute_plea_not_guilty,0.0007525298239342443,0.0
+District_Judge_SJ000237,0.0007237945047148839,0.0
+sum_attribute_transfer_inbound,0.00063096838902013,0.0
+city_Chicago,0.00043641545754548875,0.0
+District_Judge_SJ000189,0.0004302059864576536,0.0
+District_Judge_SJ000228,0.00041605760328354704,0.0
+sum_attribute_dismissal_other,0.000369598623543316,0.0
+District_Judge_SJ000203,0.00036879894104651593,0.0
+District_Judge_SJ000198,0.00035695715722696775,0.0
+city_Rockford,0.000352549828785715,0.0
+District_Judge_SJ000185,0.000239474641130067,0.0
+sum_attribute_motion_to_dismiss,0.00020111142105154795,0.0
+District_Judge_SJ000241,0.000171091283977223,0.0
+District_Judge_SJ000242,0.00016247348953441428,0.0
+District_Judge_SJ000178,0.00014653193488568667,0.0
+District_Judge_SJ000253,9.523737992749693e-05,0.0
+sum_attribute_memo_opinion,8.517543158105003e-05,0.0
+District_Judge_SJ000230,7.701745480912313e-05,0.0
+District_Judge_SJ000244,7.207823754231664e-05,0.0
+District_Judge_SJ000194,7.131614633401676e-05,0.0
+District_Judge_SJ000217,4.712501180673939e-05,0.0
+District_Judge_SJ000213,2.6033627518381492e-05,0.0
+District_Judge_SJ000240,2.459555726984158e-05,0.0
+District_Judge_SJ000246,1.484170679289281e-05,0.0
+District_Judge_SJ000243,1.412831229828989e-05,0.0
+District_Judge_SJ000208,1.3636916614104977e-05,0.0
+sum_attribute_motion_to_seal,1.3439177977553762e-05,0.0
+District_Judge_SJ000187,1.296463442316438e-05,0.0
+sum_attribute_motion_for_judgment_other,9.785677045587775e-06,0.0
+District_Judge_SJ000186,7.651762000947257e-06,0.0
+District_Judge_SJ000182,6.031534111692739e-06,0.0
+sum_attribute_granting_motion_to_dismiss,0.0,0.0
+"District_Judge_SJ000244, SJ000198",0.0,0.0
+"District_Judge_SJ000228, SJ000217",0.0,0.0
+"District_Judge_SJ000228, SJ000237",0.0,0.0
+"District_Judge_SJ000233, SJ000193",0.0,0.0
+sum_attribute_motion_for_summary_judgment,0.0,0.0
+sum_attribute_motion_for_judgment_on_the_pleadings,0.0,0.0
+"District_Judge_SJ000240, SJ000186",0.0,0.0
+"District_Judge_SJ000244, SJ000246",0.0,0.0
+"District_Judge_SJ000228, SJ000251",0.0,0.0
+sum_attribute_motion_for_settlement,0.0,0.0
+"District_Judge_SJ000242, SJ000189",0.0,0.0
+sum_attribute_remand,0.0,0.0
+District_Judge_SJ000245,0.0,0.0
+District_Judge_SJ000226,0.0,0.0
+plaintiffs_count,0.0,0.0
+sum_attribute_motion_for_dismissal_other,0.0,0.0
+District_Judge_SJ003440,0.0,0.0
+District_Judge_SJ002916,0.0,0.0
+District_Judge_SJ002890,0.0,0.0
+District_Judge_SJ002134,0.0,0.0
+District_Judge_SJ001506,0.0,0.0
+District_Judge_SJ000797,0.0,0.0
+District_Judge_SJ000261,0.0,0.0
+District_Judge_SJ000257,0.0,0.0
+"District_Judge_SJ000255, SJ000194",0.0,0.0
+District_Judge_SJ000255,0.0,0.0
+"District_Judge_SJ000253, SJ000255",0.0,0.0
+"District_Judge_SJ000253, SJ000233",0.0,0.0
+"District_Judge_SJ000253, SJ000193",0.0,0.0
+sum_attribute_motion_for_habeas_corpus,0.0,0.0
+District_Judge_SJ000251,0.0,0.0
+District_Judge_SJ000250,0.0,0.0
+District_Judge_SJ000248,0.0,0.0
+District_Judge_SJ000227,0.0,0.0
+District_Judge_SJ000219,0.0,0.0
+District_Judge_SJ000225,0.0,0.0
+District_Judge_SJ000224,0.0,0.0
+District_Judge_SJ000184,0.0,0.0
+District_Judge_SJ000179,0.0,0.0
+sum_attribute_notice_of_dismissal_other,0.0,0.0
+is_mdl_False,0.0,0.0
+sum_attribute_default_judgment,0.0,0.0
+sum_attribute_case_opened_in_error,0.0,0.0
+sum_attribute_waiver_other,0.0,0.0
+sum_attribute_waiver_of_indictment,0.0,0.0
+sum_attribute_voluntary_dismissal,0.0,0.0
+sum_attribute_trial_other,0.0,0.0
+sum_attribute_opening,0.0,0.0
+sum_attribute_trial_bench,0.0,0.0
+sum_attribute_transfer_unknown,0.0,0.0
+sum_attribute_transfer_outbound,0.0,0.0
+sum_attribute_petition_for_habeas_corpus,0.0,0.0
+sum_attribute_stipulation_other,0.0,0.0
+sum_attribute_stipulation_of_dismissal,0.0,0.0
+sum_attribute_notice_of_consent,0.0,0.0
+related_case_count,0.0,0.0
+"District_Judge_SJ000187, SJ000250",0.0,0.0
+District_Judge_SJ000211,0.0,0.0
+District_Judge_SJ000223,0.0,0.0
+sum_attribute_admin_closing,0.0,0.0
+District_Judge_SJ000218,0.0,0.0
+"District_Judge_SJ000217, SJ000208",0.0,0.0
+"District_Judge_SJ000217, SJ000203",0.0,0.0
+District_Judge_SJ000216,0.0,0.0
+District_Judge_SJ000212,0.0,0.0
+sum_attribute_motion_for_voluntary_dismissal,0.0,0.0
+sum_attribute_dismiss_with_prejudice,0.0,0.0
+District_Judge_SJ000205,0.0,0.0
+District_Judge_SJ000204,0.0,0.0
+sum_attribute_motion_for_default_judgment,0.0,0.0
+sum_attribute_motion_to_remand,0.0,0.0
+District_Judge_SJ000197,0.0,0.0
+"District_Judge_SJ000194, SJ000184",0.0,0.0
+"District_Judge_SJ000189, SJ000251",0.0,0.0
+"District_Judge_SJ000185, SJ000233",0.0,0.0

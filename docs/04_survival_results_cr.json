@@ -1,0 +1,76 @@
+{
+  "summary": {
+    "case_type": "cr",
+    "n_cases": 17565,
+    "n_closed": 16467,
+    "n_censored": 1098,
+    "pct_censored": 6.25,
+    "median_duration_days": 602.0
+  },
+  "cox_models": [
+    {
+      "label": "Cox_M1_complexity",
+      "n_cases": 17565,
+      "n_events": 16467,
+      "concordance": 0.7400169377506483,
+      "coefficients": [
+        {
+          "term": "z_n_events",
+          "coef": -0.3194018181798699,
+          "exp(coef)": 0.7265835361681469,
+          "p": 1.090671615966608e-24
+        },
+        {
+          "term": "z_n_activity_types",
+          "coef": -0.3021927940443909,
+          "exp(coef)": 0.7391955386533758,
+          "p": 4.792906352782057e-45
+        },
+        {
+          "term": "z_n_motions",
+          "coef": 0.07670578767957612,
+          "exp(coef)": 1.079724361447267,
+          "p": 0.0009816680113963012
+        },
+        {
+          "term": "z_activity_entropy",
+          "coef": -0.03077080226100314,
+          "exp(coef)": 0.9696978001513864,
+          "p": 0.07876995588297382
+        }
+      ]
+    },
+    {
+      "label": "Cox_M2_with_controls",
+      "n_cases": 17565,
+      "n_events": 16467,
+      "concordance": 0.7400169377506483,
+      "coefficients": [
+        {
+          "term": "z_n_events",
+          "coef": -0.3194018181798699,
+          "exp(coef)": 0.7265835361681469,
+          "p": 1.090671615966608e-24
+        },
+        {
+          "term": "z_n_activity_types",
+          "coef": -0.3021927940443909,
+          "exp(coef)": 0.7391955386533758,
+          "p": 4.792906352782057e-45
+        },
+        {
+          "term": "z_n_motions",
+          "coef": 0.07670578767957612,
+          "exp(coef)": 1.079724361447267,
+          "p": 0.0009816680113963012
+        },
+        {
+          "term": "z_activity_entropy",
+          "coef": -0.03077080226100314,
+          "exp(coef)": 0.9696978001513864,
+          "p": 0.07876995588297382
+        }
+      ]
+    }
+  ]
+}

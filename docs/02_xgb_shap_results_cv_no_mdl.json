@@ -1,0 +1,79 @@
+{
+  "model": "xgboost",
+  "target": "los_days",
+  "case_type": "cv",
+  "exclude_mdl": true,
+  "sample": "no_mdl",
+  "n_cases": 144940,
+  "n_train": 115952,
+  "n_test": 28988,
+  "shap_sample": 3000,
+  "split": "time (case_open_date)",
+  "metrics": {
+    "mae": 143.74746704101562,
+    "rmse": 220.4958191213611,
+    "r2": 0.44592756032943726
+  },
+  "top_shap_features": [
+    {
+      "feature": "n_events",
+      "mean_abs_shap": 206.47364807128906
+    },
+    {
+      "feature": "sum_attribute_dispositive",
+      "mean_abs_shap": 33.48509216308594
+    },
+    {
+      "feature": "Defendants_counsels_count",
+      "mean_abs_shap": 27.20077896118164
+    },
+    {
+      "feature": "sum_attribute_notice_of_motion",
+      "mean_abs_shap": 26.174795150756836
+    },
+    {
+      "feature": "sum_attribute_hearing_conf",
+      "mean_abs_shap": 22.83636474609375
+    },
+    {
+      "feature": "sum_attribute_notice_other",
+      "mean_abs_shap": 14.866345405578613
+    },
+    {
+      "feature": "sum_attribute_notice_of_appeal",
+      "mean_abs_shap": 13.775283813476562
+    },
+    {
+      "feature": "District_Judge_None",
+      "mean_abs_shap": 13.67534351348877
+    },
+    {
+      "feature": "n_motions",
+      "mean_abs_shap": 12.214921951293945
+    },
+    {
+      "feature": "sum_attribute_scheduling",
+      "mean_abs_shap": 10.921360969543457
+    },
+    {
+      "feature": "sum_attribute_motion_other",
+      "mean_abs_shap": 10.838663101196289
+    },
+    {
+      "feature": "plaintiffs_counsels_count",
+      "mean_abs_shap": 8.466064453125
+    },
+    {
+      "feature": "sum_attribute_dismissal_other",
+      "mean_abs_shap": 7.618570327758789
+    },
+    {
+      "feature": "activity_entropy",
+      "mean_abs_shap": 6.925753116607666
+    },
+    {
+      "feature": "District_Judge_SJ000185",
+      "mean_abs_shap": 6.678215026855469
+    }
+  ]
+}

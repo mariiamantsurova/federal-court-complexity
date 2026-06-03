@@ -1,0 +1,82 @@
+{
+  "summary": {
+    "case_type": "cv",
+    "n_cases": 157703,
+    "n_closed": 151640,
+    "n_censored": 6063,
+    "pct_censored": 3.84,
+    "median_duration_days": 262.0
+  },
+  "cox_models": [
+    {
+      "label": "Cox_M1_complexity",
+      "n_cases": 157703,
+      "n_events": 151640,
+      "concordance": 0.7397591315149418,
+      "coefficients": [
+        {
+          "term": "z_n_events",
+          "coef": -0.48837447690602903,
+          "exp(coef)": 0.6136230423539913,
+          "p": 4.4265959528745565e-308
+        },
+        {
+          "term": "z_n_activity_types",
+          "coef": -0.2940305595544258,
+          "exp(coef)": 0.7452537164737844,
+          "p": 0.0
+        },
+        {
+          "term": "z_n_motions",
+          "coef": 0.11469916476037252,
+          "exp(coef)": 1.1215359892682304,
+          "p": 3.080809281237392e-28
+        },
+        {
+          "term": "z_activity_entropy",
+          "coef": -0.04986994785554832,
+          "exp(coef)": 0.9513531419719227,
+          "p": 9.017342571875885e-23
+        }
+      ]
+    },
+    {
+      "label": "Cox_M2_with_controls",
+      "n_cases": 157703,
+      "n_events": 151640,
+      "concordance": 0.7877728062971698,
+      "coefficients": [
+        {
+          "term": "z_n_events",
+          "coef": -0.28019818946207,
+          "exp(coef)": 0.7556339679248232,
+          "p": 2.1159368624822796e-93
+        },
+        {
+          "term": "z_n_activity_types",
+          "coef": -0.6142636747158873,
+          "exp(coef)": 0.5410391294671051,
+          "p": 0.0
+        },
+        {
+          "term": "z_n_motions",
+          "coef": -0.1809053846251742,
+          "exp(coef)": 0.8345143128450998,
+          "p": 1.903647697634775e-58
+        },
+        {
+          "term": "z_activity_entropy",
+          "coef": 0.20302836279606737,
+          "exp(coef)": 1.2251072152208422,
+          "p": 7.286079628926825e-285
+        },
+        {
+          "term": "is_mdl",
+          "coef": -1.9128830672754387,
+          "exp(coef)": 0.14765407571550238,
+          "p": 0.0
+        }
+      ]
+    }
+  ]
+}

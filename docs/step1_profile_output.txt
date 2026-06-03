@@ -1,9 +1,0 @@
-path: /Users/miriam.mantsurova/Desktop/University/Project/Event Log.csv
-rows_processed: 4,811,483
-columns: 98 (61 attribute_*)
-unique_ucid: 175,268
-avg_events_per_case: 27.5
-date_range: 1991-01-08 -> 2021-07-11
-case_type: {'cr': 717352, 'cv': 4094131}
-case_status (top 5): [('closed', 4483625), ('open', 327858)]
-activities (top 12): [('minute_entry', 1708810), ('motion', 779032), ('notice', 754104), ('order', 538153), ('response', 198866), ('complaint', 196414), ('summons', 164796), ('answer', 115341), ('settlement', 81377), ('judgment', 63938), ('stipulation', 47428), ('waiver', 29325)]

@@ -1,0 +1,148 @@
+{
+  "target": "los_days",
+  "case_type": "all",
+  "n_cases": 168107,
+  "n_train": 134485,
+  "n_test": 33622,
+  "split": "time (case_open_date)",
+  "models": {
+    "decision_tree": {
+      "metrics": {
+        "mae": 218.37626461457256,
+        "rmse": 344.06841520832404,
+        "r2": 0.295111224923305
+      },
+      "top_features": [
+        {
+          "feature": "n_events",
+          "importance": 0.6720260905215031
+        },
+        {
+          "feature": "Defendants_pending_counts",
+          "importance": 0.10254923952689547
+        },
+        {
+          "feature": "case_type_cv",
+          "importance": 0.03967936584517574
+        },
+        {
+          "feature": "is_mdl_False",
+          "importance": 0.023930968684976482
+        },
+        {
+          "feature": "sum_attribute_scheduling",
+          "importance": 0.022029184921859058
+        },
+        {
+          "feature": "sum_attribute_dispositive",
+          "importance": 0.0138365756928783
+        },
+        {
+          "feature": "sum_attribute_notice_of_motion",
+          "importance": 0.013452769731145684
+        },
+        {
+          "feature": "sum_attribute_notice_of_appeal",
+          "importance": 0.011660964367741632
+        },
+        {
+          "feature": "Defendants_counsels_count",
+          "importance": 0.010901633823320867
+        },
+        {
+          "feature": "sum_attribute_hearing_conf",
+          "importance": 0.010002925665256603
+        },
+        {
+          "feature": "activity_entropy",
+          "importance": 0.009093303210959924
+        },
+        {
+          "feature": "sum_attribute_rescheduling",
+          "importance": 0.006103767773022132
+        },
+        {
+          "feature": "Defendants_count",
+          "importance": 0.0056030918745848144
+        },
+        {
+          "feature": "n_motions",
+          "importance": 0.005480603319436126
+        },
+        {
+          "feature": "sum_attribute_voluntary_dismissal",
+          "importance": 0.005353548081704531
+        }
+      ]
+    },
+    "random_forest": {
+      "metrics": {
+        "mae": 210.7536603452922,
+        "rmse": 324.153307569662,
+        "r2": 0.37434935685932613
+      },
+      "top_features": [
+        {
+          "feature": "n_events",
+          "importance": 0.6303670676305139
+        },
+        {
+          "feature": "Defendants_pending_counts",
+          "importance": 0.07326475038379679
+        },
+        {
+          "feature": "case_type_cv",
+          "importance": 0.032741495388016115
+        },
+        {
+          "feature": "case_type_cr",
+          "importance": 0.0307205482583088
+        },
+        {
+          "feature": "sum_attribute_scheduling",
+          "importance": 0.025758724664077182
+        },
+        {
+          "feature": "activity_entropy",
+          "importance": 0.01820122723924377
+        },
+        {
+          "feature": "sum_attribute_notice_of_appeal",
+          "importance": 0.016064993884252178
+        },
+        {
+          "feature": "sum_attribute_dispositive",
+          "importance": 0.01503422341856905
+        },
+        {
+          "feature": "sum_attribute_notice_of_motion",
+          "importance": 0.014469243213628294
+        },
+        {
+          "feature": "Defendants_counsels_count",
+          "importance": 0.013843784276160348
+        },
+        {
+          "feature": "sum_attribute_hearing_conf",
+          "importance": 0.013467343437164965
+        },
+        {
+          "feature": "is_mdl_True",
+          "importance": 0.011184126448276446
+        },
+        {
+          "feature": "is_mdl_False",
+          "importance": 0.011148982780076509
+        },
+        {
+          "feature": "sum_attribute_motion_other",
+          "importance": 0.00842751721566499
+        },
+        {
+          "feature": "n_motions",
+          "importance": 0.0078339906509136
+        }
+      ]
+    }
+  }
+}

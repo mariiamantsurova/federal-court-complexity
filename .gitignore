@@ -12,6 +12,7 @@ __pycache__/
 
 # Large data (keep locally; do not push to GitHub)
 Event Log.csv
+Event Log_model.csv
 data/*.parquet
 data/*.csv
 !data/.gitkeep

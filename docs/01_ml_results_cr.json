@@ -1,0 +1,148 @@
+{
+  "target": "los_days",
+  "case_type": "cr",
+  "n_cases": 16467,
+  "n_train": 13173,
+  "n_test": 3294,
+  "split": "time (case_open_date)",
+  "models": {
+    "decision_tree": {
+      "metrics": {
+        "mae": 608.2511940269527,
+        "rmse": 812.9298369458635,
+        "r2": -3.166214380537361
+      },
+      "top_features": [
+        {
+          "feature": "n_events",
+          "importance": 0.783085999298195
+        },
+        {
+          "feature": "sum_attribute_notice_of_appeal",
+          "importance": 0.02932175242305196
+        },
+        {
+          "feature": "n_motions",
+          "importance": 0.028159005828050282
+        },
+        {
+          "feature": "activity_entropy",
+          "importance": 0.01763553767765014
+        },
+        {
+          "feature": "sum_attribute_notice_of_motion",
+          "importance": 0.0160077232059433
+        },
+        {
+          "feature": "Defendants_count",
+          "importance": 0.010671181215082228
+        },
+        {
+          "feature": "sum_attribute_motion_other",
+          "importance": 0.009985935644363113
+        },
+        {
+          "feature": "sum_attribute_dispositive",
+          "importance": 0.009599744095519587
+        },
+        {
+          "feature": "Magistrate_Judge_True",
+          "importance": 0.009252646649729508
+        },
+        {
+          "feature": "n_activity_types",
+          "importance": 0.009215835500180644
+        },
+        {
+          "feature": "Defendants_pending_counts",
+          "importance": 0.009154602558082684
+        },
+        {
+          "feature": "Defendants_counsels_count",
+          "importance": 0.008916652213669512
+        },
+        {
+          "feature": "sum_attribute_hearing_conf",
+          "importance": 0.008132961263225146
+        },
+        {
+          "feature": "Magistrate_Judge_False",
+          "importance": 0.006801491302068618
+        },
+        {
+          "feature": "sum_attribute_rescheduling",
+          "importance": 0.006369605756247816
+        }
+      ]
+    },
+    "random_forest": {
+      "metrics": {
+        "mae": 583.8154913644041,
+        "rmse": 750.9575194095387,
+        "r2": -2.555217923233924
+      },
+      "top_features": [
+        {
+          "feature": "n_events",
+          "importance": 0.6822680368906772
+        },
+        {
+          "feature": "activity_entropy",
+          "importance": 0.045048330512210355
+        },
+        {
+          "feature": "sum_attribute_notice_of_appeal",
+          "importance": 0.021323556975489644
+        },
+        {
+          "feature": "n_motions",
+          "importance": 0.021235199300129976
+        },
+        {
+          "feature": "sum_attribute_motion_other",
+          "importance": 0.01985258070977498
+        },
+        {
+          "feature": "sum_attribute_notice_of_motion",
+          "importance": 0.019641148438358944
+        },
+        {
+          "feature": "sum_attribute_rescheduling",
+          "importance": 0.018564852504788117
+        },
+        {
+          "feature": "sum_attribute_hearing_conf",
+          "importance": 0.0180317939101919
+        },
+        {
+          "feature": "Defendants_counsels_count",
+          "importance": 0.0171898010733745
+        },
+        {
+          "feature": "Defendants_count",
+          "importance": 0.01599504665534125
+        },
+        {
+          "feature": "sum_attribute_scheduling",
+          "importance": 0.014055959234450004
+        },
+        {
+          "feature": "sum_attribute_dispositive",
+          "importance": 0.014023084363508572
+        },
+        {
+          "feature": "Defendants_pending_counts",
+          "importance": 0.009470267943270038
+        },
+        {
+          "feature": "n_activity_types",
+          "importance": 0.009289792325220921
+        },
+        {
+          "feature": "plaintiffs_counsels_count",
+          "importance": 0.008030862935261935
+        }
+      ]
+    }
+  }
+}

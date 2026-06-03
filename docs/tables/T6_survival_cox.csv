@@ -1,0 +1,11 @@
+case_type,model,term,coef,hazard_ratio,p_value,concordance
+all,Cox_M1_complexity,z_n_events,-0.3667,0.693,1.0234483714559619e-213,0.7481077032791819
+all,Cox_M1_complexity,z_n_activity_types,-0.4432,0.642,0.0,0.7481077032791819
+all,Cox_M1_complexity,z_n_motions,0.0795,1.0827,1.514073725561808e-17,0.7481077032791819
+all,Cox_M1_complexity,z_activity_entropy,0.0993,1.1044,9.416083936893788e-104,0.7481077032791819
+all,Cox_M2_with_controls,z_n_events,-0.3234,0.7237,4.3667746994751117e-135,0.7754677221682784
+all,Cox_M2_with_controls,z_n_activity_types,-0.547,0.5787,0.0,0.7754677221682784
+all,Cox_M2_with_controls,z_n_motions,-0.1331,0.8754,2.2731403445590116e-36,0.7754677221682784
+all,Cox_M2_with_controls,z_activity_entropy,0.1702,1.1855,5.6366984906939364e-219,0.7754677221682784
+all,Cox_M2_with_controls,case_type_cv,0.7939,2.2119,0.0,0.7754677221682784
+all,Cox_M2_with_controls,is_mdl,-1.7947,0.1662,0.0,0.7754677221682784

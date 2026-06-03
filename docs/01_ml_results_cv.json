@@ -1,0 +1,148 @@
+{
+  "target": "los_days",
+  "case_type": "cv",
+  "n_cases": 151640,
+  "n_train": 121312,
+  "n_test": 30328,
+  "split": "time (case_open_date)",
+  "models": {
+    "decision_tree": {
+      "metrics": {
+        "mae": 192.8668183464673,
+        "rmse": 290.64972712042777,
+        "r2": 0.5098602614586578
+      },
+      "top_features": [
+        {
+          "feature": "n_events",
+          "importance": 0.7701484661210879
+        },
+        {
+          "feature": "is_mdl_True",
+          "importance": 0.04290118370687566
+        },
+        {
+          "feature": "sum_attribute_scheduling",
+          "importance": 0.03487646293909062
+        },
+        {
+          "feature": "sum_attribute_dispositive",
+          "importance": 0.021158875425103602
+        },
+        {
+          "feature": "sum_attribute_hearing_conf",
+          "importance": 0.014973668473416172
+        },
+        {
+          "feature": "Defendants_counsels_count",
+          "importance": 0.014111570723061037
+        },
+        {
+          "feature": "sum_attribute_notice_of_motion",
+          "importance": 0.01386714458806094
+        },
+        {
+          "feature": "District_Judge_SJ000212",
+          "importance": 0.012341608179334346
+        },
+        {
+          "feature": "sum_attribute_notice_of_appeal",
+          "importance": 0.012150343998693585
+        },
+        {
+          "feature": "sum_attribute_dismiss_with_prejudice",
+          "importance": 0.009767095326700836
+        },
+        {
+          "feature": "District_Judge_None",
+          "importance": 0.007483841901262906
+        },
+        {
+          "feature": "activity_entropy",
+          "importance": 0.007297930743843518
+        },
+        {
+          "feature": "n_motions",
+          "importance": 0.004747230386221052
+        },
+        {
+          "feature": "sum_attribute_notice_other",
+          "importance": 0.004683005204046212
+        },
+        {
+          "feature": "sum_attribute_rescheduling",
+          "importance": 0.0045530371611545856
+        }
+      ]
+    },
+    "random_forest": {
+      "metrics": {
+        "mae": 184.391096433665,
+        "rmse": 272.12456007930416,
+        "r2": 0.5703492684373277
+      },
+      "top_features": [
+        {
+          "feature": "n_events",
+          "importance": 0.7388211150963708
+        },
+        {
+          "feature": "sum_attribute_scheduling",
+          "importance": 0.03534324628674831
+        },
+        {
+          "feature": "is_mdl_True",
+          "importance": 0.021629619648975418
+        },
+        {
+          "feature": "sum_attribute_dispositive",
+          "importance": 0.021235472482843354
+        },
+        {
+          "feature": "is_mdl_False",
+          "importance": 0.01989371160797461
+        },
+        {
+          "feature": "Defendants_counsels_count",
+          "importance": 0.0172467644639303
+        },
+        {
+          "feature": "sum_attribute_notice_of_appeal",
+          "importance": 0.01700635277528843
+        },
+        {
+          "feature": "sum_attribute_notice_of_motion",
+          "importance": 0.014946185900563414
+        },
+        {
+          "feature": "sum_attribute_hearing_conf",
+          "importance": 0.013676208377625468
+        },
+        {
+          "feature": "activity_entropy",
+          "importance": 0.013077615261936319
+        },
+        {
+          "feature": "District_Judge_SJ000212",
+          "importance": 0.010564715634868757
+        },
+        {
+          "feature": "sum_attribute_dismiss_with_prejudice",
+          "importance": 0.00766685052058674
+        },
+        {
+          "feature": "n_motions",
+          "importance": 0.007433234629072774
+        },
+        {
+          "feature": "sum_attribute_rescheduling",
+          "importance": 0.006888817427918341
+        },
+        {
+          "feature": "District_Judge_None",
+          "importance": 0.006800289440403769
+        }
+      ]
+    }
+  }
+}

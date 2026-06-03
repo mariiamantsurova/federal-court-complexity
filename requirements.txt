@@ -6,3 +6,5 @@ matplotlib>=3.7
 seaborn>=0.13
 statsmodels>=0.14
 lifelines>=0.30
+xgboost>=2.0
+shap>=0.44
