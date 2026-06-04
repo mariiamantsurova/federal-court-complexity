@@ -8,3 +8,4 @@ statsmodels>=0.14
 lifelines>=0.30
 xgboost>=2.0
 shap>=0.44
+pm4py>=2.7

@@ -269,3 +269,25 @@ python scripts/run_survival_analysis.py --case-type cr
 ```
 
 **Outputs:** `data/survival_cases.parquet`, `reports/figures/04_km_*.png`, `docs/04_survival_results*.json`, `docs/tables/T6_survival_cox*.csv`
+
+---
+
+## Process mining visuals (report figures)
+
+Step-by-step explanation for the thesis: **[docs/PROCESS_MINING.md](docs/PROCESS_MINING.md)**.
+
+```bash
+python scripts/run_process_mining_viz.py
+# faster dev run:
+python scripts/run_process_mining_viz.py --dfg-sample 800 --transition-sample 500
+```
+
+**Outputs:**
+
+| File | Description |
+|------|-------------|
+| `reports/figures/05_trace_exemplars_cv.png` | Four illustrative event timelines |
+| `reports/figures/05_dfg_cv_sample.png` | Directly-follows graph (PM4Py) |
+| `reports/figures/05_transitions_cv_q1_q4.png` | Transition heatmaps: low vs high LOS |
+| `docs/tables/T7_trace_exemplars.csv` | Appendix table for selected cases |
+| `docs/05_process_mining.json` | Run metadata |

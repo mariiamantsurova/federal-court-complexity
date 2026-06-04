@@ -7,8 +7,7 @@ Build model-ready Event Log.csv (chunked stream).
 - Converts Magistrate_Judge to boolean (True = present, False = missing)
 - Applies log1p to zero-inflated count columns flagged in notebooks/00_eda.ipynb
 
-Does not modify the source file. For case-level parquet (LOS, complexity),
-use src/build_features.py instead.
+Does not modify the source file. For case-level parquet (LOS, complexity)
 
 Usage:
   python scripts/build_features.py

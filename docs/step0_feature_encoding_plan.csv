@@ -1,0 +1,99 @@
+column,dtype,role,n_unique_sample,pct_missing_sample,complexity,suggested_encoding
+Unnamed: 0,int64,identifier,500000,0.0,structural,exclude — use as group key only
+ucid,object,identifier,21871,0.0,structural,exclude — use as group key only
+date_filed,object,datetime,5213,0.0,structural,derive time features (no one-hot)
+Activity,object,categorical,26,0.0,medium,one-hot (watch sparsity) or target encoding
+event_judge,object,categorical,1243,0.0,very high,parse judge id → target encoding or embedding (8–32 dim)
+attribute_duplicates,int64,numeric_count,35,0.0,low–medium,numeric — scale or log1p if skewed
+attribute_memo_opinion,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_scheduling,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_rescheduling,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_hearing_conf,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_admin_closing,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_bilateral_unopposed,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_case_opened_in_error,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_default_judgment,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_dismiss_with_prejudice,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_dismiss_without_prejudice,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_dismissal_other,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_dispositive,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_granting_motion_for_summary_judgment,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_granting_motion_to_dismiss,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_for_arbitration,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_for_default_judgment,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_for_dismissal_other,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_for_habeas_corpus,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_for_judgment_as_a_matter_of_law,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_for_judgment_on_the_pleadings,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_for_judgment_other,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_for_settlement,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_for_summary_judgment,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_for_time_extension,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_for_voluntary_dismissal,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_other,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_to_certify_class,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_to_dismiss,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_to_remand,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_motion_to_seal,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_notice_of_appeal,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_notice_of_consent,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_notice_of_dismissal_other,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_notice_of_motion,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_notice_of_settlement,bool,boolean_flag,1,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_notice_of_voluntary_dismissal,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_notice_other,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_opening,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_petition_for_habeas_corpus,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_petition_other,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_plea_guilty,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_plea_not_guilty,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_proposed,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_remand,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_settlement_consent_decree,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_settlement_rule_68,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_stipulation_for_judgment,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_stipulation_for_settlement,bool,boolean_flag,1,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_stipulation_of_dismissal,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_stipulation_other,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_transfer_inbound,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_transfer_outbound,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_transfer_unknown,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_transferred_entry,bool,boolean_flag,1,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_trial_bench,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_trial_jury,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_trial_other,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_voluntary_dismissal,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_waiver_of_indictment,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+attribute_waiver_other,bool,boolean_flag,2,0.0,low,binary 0/1; at case level: sum / any / entropy
+city,object,categorical,1,0.0,low,one-hot encoding
+case_status,object,categorical,2,0.0,low,one-hot encoding
+case_type,object,categorical,2,0.0,low,one-hot encoding
+nature_suit,object,categorical,77,0.0,high,"target encoding, feature hashing, or small embedding"
+is_mdl,bool,boolean,2,0.0,low,binary 0/1 (no one-hot)
+District_Judge,object,categorical,58,9.84,high,parse judge id → target encoding or embedding (8–32 dim)
+Magistrate_Judge,object,categorical,22,88.17,medium,parse judge id → target encoding or embedding (8–32 dim)
+plaintiffs_count,float64,numeric,57,0.0,low–medium,numeric — standardize / robust scale
+plaintiffs_share_ind,float64,numeric,114,0.0,low–medium,numeric — standardize / robust scale
+plaintiffs_share_pro_se,float64,numeric,25,0.0,low–medium,numeric — standardize / robust scale
+plaintiffs_share_pro_hac_vice,float64,numeric,11,0.0,low–medium,numeric — standardize / robust scale
+plaintiffs_counsels_count,float64,numeric,139,0.0,low–medium,numeric — standardize / robust scale
+Defendants_count,float64,numeric,50,0.0,low–medium,numeric — standardize / robust scale
+Defendants_share_ind,float64,numeric,133,0.0,low–medium,numeric — standardize / robust scale
+Defendants_share_pro_se,float64,numeric,46,0.0,low–medium,numeric — standardize / robust scale
+Defendants_share_pro_hac_vice,float64,numeric,21,0.0,low–medium,numeric — standardize / robust scale
+Defendants_counsels_count,float64,numeric,108,0.0,low–medium,numeric — standardize / robust scale
+Defendants_highest_offense_opening,object,categorical,5,1.84,low,one-hot encoding
+Defendants_highest_offense_terminated,object,categorical,5,7.63,low,one-hot encoding
+Defendants_pending_counts,float64,numeric,36,0.0,low–medium,numeric — standardize / robust scale
+Defendants_terminated_counts,float64,numeric,62,0.0,low–medium,numeric — standardize / robust scale
+Party_Amicus,int64,boolean,2,0.0,low,binary 0/1 (no one-hot)
+Party_Counter_Claimant,int64,boolean,2,0.0,low,binary 0/1 (no one-hot)
+Party_Counter_Defendant,int64,boolean,2,0.0,low,binary 0/1 (no one-hot)
+Party_Court_Monitor,int64,boolean,1,0.0,low,binary 0/1 (no one-hot)
+Party_Intervenor,int64,boolean,2,0.0,low,binary 0/1 (no one-hot)
+Party_Material_Witness,int64,boolean,2,0.0,low,binary 0/1 (no one-hot)
+Party_Third_Party_Defendant,int64,boolean,2,0.0,low,binary 0/1 (no one-hot)
+Party_Third_Party_Plaintiff,int64,boolean,2,0.0,low,binary 0/1 (no one-hot)
+Party_Trustee,int64,boolean,2,0.0,low,binary 0/1 (no one-hot)
+Other_courts,int64,numeric,2,0.0,low–medium,numeric — standardize / robust scale
+related_case_count,int64,numeric,8,0.0,low–medium,numeric — standardize / robust scale
