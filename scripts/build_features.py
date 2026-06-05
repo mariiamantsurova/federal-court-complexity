@@ -3,11 +3,8 @@
 Build model-ready Event Log.csv (chunked stream).
 
 - Keeps **closed** cases only (`case_status == "closed"`); drops open-case events
-- Drops cr-heavy / redundant columns
 - Converts Magistrate_Judge to boolean (True = present, False = missing)
 - Applies log1p to zero-inflated count columns flagged in notebooks/00_eda.ipynb
-
-Does not modify the source file. For case-level parquet (LOS, complexity)
 
 Usage:
   python scripts/build_features.py
@@ -31,7 +28,6 @@ DEFAULT_OUTPUT = ROOT / "Event Log_model.csv"
 DEFAULT_DROP_COLS = [
     "Defendants_highest_offense_opening",
     "Defendants_highest_offense_terminated",
-    "nature_suit",
 ]
 
 MAGISTRATE_COL = "Magistrate_Judge"

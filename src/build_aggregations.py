@@ -10,7 +10,7 @@ Requires data/case_features.parquet
 
 Usage:
   python src/build_aggregations.py
-  python src/build_aggregations.py --by-case-type
+  python src/build_aggregations.py 
 """
 from __future__ import annotations
 
@@ -29,7 +29,6 @@ from features import (
     TARGET,
     VALID_CASE_TYPES,
     add_derived_columns,
-    filter_by_case_type,
 )
 
 DEFAULT_CASE_INPUT = ROOT / "data" / "case_features.parquet"
@@ -117,8 +116,6 @@ def _write_group(
 def build_all(
     case_input: Path,
     out_dir: Path,
-    *,
-    by_case_type: bool = False,
 ) -> dict[str, pd.DataFrame]:
     if not case_input.is_file():
         raise FileNotFoundError(
@@ -131,13 +128,6 @@ def build_all(
     result: dict[str, pd.DataFrame] = {}
 
     _write_group(cases, out_dir, label="all")
-    result["by_case"] = add_derived_columns(cases)
-
-    if by_case_type:
-        for case_type in VALID_CASE_TYPES:
-            subset = filter_by_case_type(cases, case_type)
-            _write_group(subset, out_dir, label=case_type)
-            result[f"by_case_{case_type}"] = add_derived_columns(subset)
 
     return result
 
@@ -149,18 +139,12 @@ def main() -> None:
     )
     parser.add_argument("--input", type=Path, default=DEFAULT_CASE_INPUT)
     parser.add_argument("--output-dir", type=Path, default=OUT_DIR)
-    parser.add_argument(
-        "--by-case-type",
-        action="store_true",
-        help="Also write by_case and by_judge parquet files for cv and cr subsets",
-    )
 
     args = parser.parse_args()
 
     build_all(
         args.input,
         args.output_dir,
-        by_case_type=args.by_case_type,
     )
 
 

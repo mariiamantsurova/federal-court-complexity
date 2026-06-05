@@ -1,5 +1,0 @@
-archetype,report_label,ucid,los_days,n_events,n_motions,n_activity_types,activity_entropy,complexity_index,District_Judge
-typical_efficient,A,ilnd;;1:02-cv-00492,300.0,26,5,8,1.6805691805229725,0.19485973430114142,SJ000250
-typical_long,B,ilnd;;1:03-cv-05556,1100.0,28,7,6,1.557485706630166,-0.0835297792123702,SJ000232
-high_complexity_moderate_los,C,ilnd;;1:02-cv-07021,443.0,76,19,13,1.9339365653923506,3.027284866946731,SJ000182
-moderate_complexity_very_long_los,D,ilnd;;1:03-cv-00260,6573.0,23,3,7,1.7252715847865958,-0.09678589959511104,SJ000241
