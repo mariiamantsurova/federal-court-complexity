@@ -1,0 +1,42 @@
+{
+  "model": "RandomForest",
+  "case_type": "all",
+  "exclude_mdl": false,
+  "n_train": 134485,
+  "n_test": 33622,
+  "n_features": 35,
+  "hyperparams": {
+    "n_estimators": 200,
+    "max_depth": 15,
+    "min_samples_leaf": 5
+  },
+  "metrics": {
+    "MAE": 239.49,
+    "RMSE": 472.68,
+    "R2": 0.4709
+  },
+  "top_features_gini": [
+    "n_events",
+    "complexity_index",
+    "sum_attribute_hearing_conf",
+    "n_motions",
+    "sum_attribute_scheduling",
+    "n_activity_types",
+    "Defendants_pending_counts",
+    "activity_entropy",
+    "Defendants_counsels_count",
+    "Defendants_terminated_counts"
+  ],
+  "top_features_shap": [
+    "n_events",
+    "complexity_index",
+    "sum_attribute_hearing_conf",
+    "n_motions",
+    "sum_attribute_scheduling",
+    "Defendants_share_ind",
+    "Defendants_pending_counts",
+    "n_activity_types",
+    "Other_courts",
+    "sum_attribute_dispositive"
+  ]
+}

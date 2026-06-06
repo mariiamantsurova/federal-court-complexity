@@ -1,0 +1,43 @@
+{
+  "model": "XGBoost",
+  "case_type": "all",
+  "exclude_mdl": false,
+  "n_train": 134485,
+  "n_test": 33622,
+  "n_features": 35,
+  "hyperparams": {
+    "n_estimators": 500,
+    "max_depth": 6,
+    "learning_rate": 0.05,
+    "subsample": 0.8
+  },
+  "metrics": {
+    "MAE": 233.97,
+    "RMSE": 466.55,
+    "R2": 0.4845
+  },
+  "top_features_shap": [
+    "n_events",
+    "Defendants_share_ind",
+    "Defendants_pending_counts",
+    "complexity_index",
+    "sum_attribute_dispositive",
+    "Other_courts",
+    "sum_attribute_scheduling",
+    "sum_attribute_hearing_conf",
+    "n_motions",
+    "Defendants_counsels_count"
+  ],
+  "mean_abs_shap": {
+    "n_events": 229.5781,
+    "Defendants_share_ind": 33.5224,
+    "Defendants_pending_counts": 32.6153,
+    "complexity_index": 31.7938,
+    "sum_attribute_dispositive": 30.6921,
+    "Other_courts": 30.35,
+    "sum_attribute_scheduling": 29.3209,
+    "sum_attribute_hearing_conf": 28.971,
+    "n_motions": 28.6725,
+    "Defendants_counsels_count": 20.9706
+  }
+}
