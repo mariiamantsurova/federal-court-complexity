@@ -31,6 +31,10 @@ def _suit_entropy(suit_counts: Counter) -> float:
     return entropy
 
 
+# Placeholder values that carry no real suit information — exclude before feature extraction.
+_NOT_APPLICABLE = {"not applicable", "not_applicable", "n/a", "none", "not_specified", ""}
+
+
 def extract_suit_features(nature_suits_list: Optional[list[str]]) -> dict:
     """
     Extract tree-friendly features from nature_suits array.
@@ -49,6 +53,14 @@ def extract_suit_features(nature_suits_list: Optional[list[str]]) -> dict:
             - suit_freq_<suittype>: Proportion of each suit type
     """
     features = {}
+
+    # Strip placeholder "not applicable" entries — they are data-quality artefacts,
+    # not real suit classifications, and create a spurious high-weight feature.
+    if nature_suits_list:
+        nature_suits_list = [
+            s for s in nature_suits_list
+            if s.lower().strip().replace(" ", "_") not in _NOT_APPLICABLE
+        ]
 
     if not nature_suits_list or len(nature_suits_list) == 0:
         # No suits case

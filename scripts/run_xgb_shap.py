@@ -93,8 +93,17 @@ def main() -> None:
     train_df, test_df, cutoff = temporal_split(df)
     print(f"Temporal split: cutoff={cutoff}  train={len(train_df):,}  test={len(test_df):,}")
 
-    X_train, y_train = prepare_for_trees(train_df)
-    X_test,  y_test  = prepare_for_trees(test_df)
+    # Build judge target encoding from training data only, then apply to both splits.
+    judge_target_map = (
+        train_df.dropna(subset=["log_los_days"])
+        .groupby("District_Judge")["log_los_days"]
+        .median()
+        .to_dict()
+    )
+    print(f"Judge target encoding: {len(judge_target_map)} judges in training set")
+
+    X_train, y_train = prepare_for_trees(train_df, target="log_los_days", judge_target_map=judge_target_map)
+    X_test,  y_test  = prepare_for_trees(test_df,  target="log_los_days", judge_target_map=judge_target_map)
     X_test = X_test.reindex(columns=X_train.columns, fill_value=0)
     print(f"Feature matrix: {X_train.shape[1]} features")
 
@@ -122,10 +131,12 @@ def main() -> None:
     print(f"  Training done in {time.time() - t0:.1f}s")
 
     # ── metrics ───────────────────────────────────────────────────────────────
-    y_pred = model.predict(X_test)
-    mae  = mean_absolute_error(y_test, y_pred)
-    rmse = mean_squared_error(y_test, y_pred) ** 0.5
-    r2   = r2_score(y_test, y_pred)
+    y_pred_log  = model.predict(X_test)
+    y_pred_days = np.exp(y_pred_log)
+    y_true_days = np.exp(y_test.values)
+    mae  = mean_absolute_error(y_true_days, y_pred_days)
+    rmse = mean_squared_error(y_true_days, y_pred_days) ** 0.5
+    r2   = r2_score(y_true_days, y_pred_days)
     print(f"\nTest metrics:  MAE={mae:.1f}  RMSE={rmse:.1f}  R²={r2:.4f}")
 
     # ── SHAP ─────────────────────────────────────────────────────────────────
@@ -135,6 +146,7 @@ def main() -> None:
     shap_sample = X_test.iloc[:n_shap]
     explainer   = shap.TreeExplainer(model)
     shap_values = explainer.shap_values(shap_sample)
+    # SHAP values are in log-days (model predicts log_los_days)
     print(f"  SHAP done in {time.time() - t1:.1f}s")
 
     mean_abs_shap = np.abs(shap_values).mean(axis=0)
@@ -152,7 +164,7 @@ def main() -> None:
     fig, ax = plt.subplots(figsize=(8, 5))
     top = shap_df.head(top_n)
     ax.barh(top["feature"][::-1], top["mean_abs_shap"][::-1], color="#DD8452")
-    ax.set_xlabel("Mean |SHAP value| (days)")
+    ax.set_xlabel("Mean |SHAP value| (log-days)")
     ax.set_title(f"XGBoost SHAP – Top {top_n} Features  [{label}]")
     fig.tight_layout()
     bar_path = figs_dir / f"02_xgb_shap_bar{suffix}.png"

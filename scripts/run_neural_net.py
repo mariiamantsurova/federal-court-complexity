@@ -15,8 +15,8 @@ Architecture (both modes):
                                                           │       → FC→BN→ReLU→Drop
                                                           └──────→ FC(1) = LOS (days)
 
-Note: nature_suits column is absent from by_case.parquet, so suit embeddings
-      are disabled regardless of model choice.
+Note: suit embeddings are available (nature_suits column exists in by_case.parquet)
+      but are not used by this script — judge embedding captures the main signal.
 
 Outputs:
   docs/04_neural_net_results{suffix}.json
@@ -243,7 +243,7 @@ def main() -> None:
     parser.add_argument("--batch-size",    type=int,   default=1024)
     parser.add_argument("--lr",            type=float, default=1e-3)
     parser.add_argument("--hidden-dim",    type=int,   default=128)
-    parser.add_argument("--embedding-dim", type=int,   default=16)
+    parser.add_argument("--embedding-dim", type=int,   default=32)
     parser.add_argument("--dropout",       type=float, default=0.3)
     parser.add_argument("--patience",      type=int,   default=8,
                         help="Early stopping patience (val loss epochs)")
@@ -264,8 +264,8 @@ def main() -> None:
     df = load_data(args.case_type, args.exclude_mdl)
 
     # Temporal 70/15/15 split: train → val → test in chronological order.
-    # Pre-filter to rows that prepare_for_neural_net would keep, so indices align.
-    df_valid = df[df["los_days"].notna() & (df["los_days"] >= 0)].copy()
+    # Filter on log_los_days (NaN when los_days <= 0) so the target is always valid.
+    df_valid = df[df["log_los_days"].notna()].copy()
     dates = pd.to_datetime(df_valid["case_open_date"])
     p70 = dates.quantile(0.70)
     p85 = dates.quantile(0.85)
@@ -278,7 +278,7 @@ def main() -> None:
           f"val: {train_cutoff_str}–{val_cutoff_str}  test: after {val_cutoff_str}")
     print(f"  train={len(idx_train):,}  val={len(idx_val):,}  test={len(idx_test):,}")
 
-    prepared_data, y = prepare_for_neural_net(df_valid)
+    prepared_data, y = prepare_for_neural_net(df_valid, target="log_los_days")
 
     n_numeric     = prepared_data["numeric_features"].shape[1]
     judge_vocab   = prepared_data["judge_vocab"]
@@ -329,7 +329,7 @@ def main() -> None:
     n_params = sum(p.numel() for p in model.parameters() if p.requires_grad)
     print(f"Trainable parameters: {n_params:,}")
 
-    criterion = nn.MSELoss()
+    criterion = nn.HuberLoss(delta=1.0)  # robust to log-space outliers; delta=1 log-day
     optimiser = torch.optim.Adam(model.parameters(), lr=args.lr, weight_decay=1e-4)
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
         optimiser, mode="min", factor=0.5, patience=4
@@ -351,7 +351,7 @@ def main() -> None:
         train_losses.append(tr_loss)
         val_losses.append(val_loss)
 
-        improved = val_loss < best_val_loss - 1.0  # 1-day² improvement threshold
+        improved = val_loss < best_val_loss - 1e-3  # 0.001 Huber-loss improvement threshold
         if improved:
             best_val_loss = val_loss
             best_state    = {k: v.cpu().clone() for k, v in model.state_dict().items()}
@@ -360,9 +360,7 @@ def main() -> None:
             no_improve += 1
 
         if epoch % 5 == 0 or epoch == 1:
-            rmse_tr = tr_loss ** 0.5
-            rmse_va = val_loss ** 0.5
-            print(f"  ep {epoch:3d}  train RMSE={rmse_tr:.1f}  val RMSE={rmse_va:.1f}"
+            print(f"  ep {epoch:3d}  train loss={tr_loss:.4f}  val loss={val_loss:.4f}"
                   + ("  *" if improved else ""))
 
         if no_improve >= args.patience:
@@ -377,19 +375,21 @@ def main() -> None:
         model.load_state_dict(best_state)
 
     # ── test evaluation ───────────────────────────────────────────────────────
-    _, y_pred_arr, y_true_arr = eval_epoch(model, test_loader, criterion, device)
-    mae  = mean_absolute_error(y_true_arr, y_pred_arr)
-    rmse = mean_squared_error(y_true_arr, y_pred_arr) ** 0.5
-    r2   = r2_score(y_true_arr, y_pred_arr)
+    _, y_pred_log, y_true_log = eval_epoch(model, test_loader, criterion, device)
+    y_pred_days = np.exp(y_pred_log)
+    y_true_days = np.exp(y_true_log)
+    mae  = mean_absolute_error(y_true_days, y_pred_days)
+    rmse = mean_squared_error(y_true_days, y_pred_days) ** 0.5
+    r2   = r2_score(y_true_days, y_pred_days)
     print(f"\nTest metrics:  MAE={mae:.1f}  RMSE={rmse:.1f}  R²={r2:.4f}")
 
     # ── loss curve ────────────────────────────────────────────────────────────
     fig, ax = plt.subplots(figsize=(7, 4))
     epochs_range = range(1, len(train_losses) + 1)
-    ax.plot(epochs_range, [l ** 0.5 for l in train_losses], label="Train RMSE")
-    ax.plot(epochs_range, [l ** 0.5 for l in val_losses],   label="Val RMSE")
+    ax.plot(epochs_range, train_losses, label="Train Huber Loss")
+    ax.plot(epochs_range, val_losses,   label="Val Huber Loss")
     ax.set_xlabel("Epoch")
-    ax.set_ylabel("RMSE (days)")
+    ax.set_ylabel("Huber Loss (log-days)")
     ct_label = {"cv": "Civil", "cr": "Criminal"}.get(args.case_type or "", "All")
     ax.set_title(f"NN Loss Curve  [{ct_label}]  ({mode_label})")
     ax.legend()
@@ -428,7 +428,7 @@ def main() -> None:
             "dropout": args.dropout,
         },
         "metrics": {"MAE": round(mae, 2), "RMSE": round(rmse, 2), "R2": round(r2, 4)},
-        "best_val_rmse": round(best_val_loss ** 0.5, 2),
+        "best_val_huber_loss": round(best_val_loss, 6),
         "train_time_s": round(elapsed, 1),
     }
     json_path = docs_dir / f"04_neural_net_results{suffix}.json"

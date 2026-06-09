@@ -77,12 +77,12 @@ CATEGORICAL_COLS = ["city"]
 EXCLUDED_COLS = [
     "ucid",
     "case_open_date",
-    "case_type",  # Excluded to avoid case_type split model interference
-    "District_Judge",  # High cardinality, save for judge models
-    "is_mdl",  # Optional: could include, but often used for sensitivity
-    "los_days",  # Target variable
+    "case_type",     # Handled explicitly via _prepare_case_flags (binary is_cv feature)
+    "District_Judge",  # Handled explicitly via _prepare_judge_feature (target encoding)
+    "is_mdl",        # Handled explicitly via _prepare_case_flags
+    "los_days",      # Target variable
     "log_los_days",  # Target variable
-    "nature_suit",  # Raw categorical, collinear with case_type
+    "nature_suit",   # Raw categorical, collinear with case_type
     "nature_suits",  # Raw array (we extract features from it)
 ]
 
@@ -131,6 +131,39 @@ def _prepare_numeric_features(df: pd.DataFrame, numeric_cols: list[str]) -> pd.D
     )
 
     return X_numeric_imputed
+
+
+def _prepare_judge_feature(
+    df: pd.DataFrame,
+    judge_target_map: dict | None = None,
+) -> pd.DataFrame:
+    """
+    Encode District_Judge.
+
+    If judge_target_map is provided (built from training-set median log_los_days),
+    uses target encoding — a single continuous feature directly correlated with LOS.
+    Falls back to label encoding (arbitrary integers) when no map is given.
+    """
+    if "District_Judge" not in df.columns:
+        return pd.DataFrame(index=df.index)
+    if judge_target_map is not None:
+        fallback = float(np.median(list(judge_target_map.values())))
+        encoded = df["District_Judge"].map(judge_target_map).fillna(fallback)
+        return pd.DataFrame({"judge_target_encoded": encoded.values.astype(float)}, index=df.index)
+    codes, _ = pd.factorize(df["District_Judge"].fillna("<UNK>"))
+    return pd.DataFrame({"judge_encoded": codes.astype(float)}, index=df.index)
+
+
+def _prepare_case_flags(df: pd.DataFrame) -> pd.DataFrame:
+    """Binary features for case_type (is_cv: cv=1, cr=0) and is_mdl."""
+    cols: dict[str, pd.Series] = {}
+    if "case_type" in df.columns:
+        cols["is_cv"] = (df["case_type"] == "cv").astype(float)
+    if "is_mdl" in df.columns:
+        cols["is_mdl_flag"] = df["is_mdl"].astype(float)
+    if not cols:
+        return pd.DataFrame(index=df.index)
+    return pd.DataFrame(cols, index=df.index)
 
 
 def _prepare_suit_features(df: pd.DataFrame) -> pd.DataFrame:
@@ -189,6 +222,7 @@ def prepare_for_trees(
     target: str = "los_days",
     include_suit_features: bool = True,
     scale: bool = False,
+    judge_target_map: dict | None = None,
 ) -> tuple[pd.DataFrame, pd.Series]:
     """
     Prepare data for tree-based models (Random Forest, XGBoost, Decision Tree).
@@ -239,8 +273,14 @@ def prepare_for_trees(
     # 3. Categorical features (city)
     X_categorical = _prepare_categorical_features(df, CATEGORICAL_COLS)
 
+    # 4. Case-level flags (is_cv, is_mdl)
+    X_flags = _prepare_case_flags(df)
+
+    # 5. Judge feature: target encoding when map provided, label encoding otherwise
+    X_judge = _prepare_judge_feature(df, judge_target_map)
+
     # Combine all features
-    X = pd.concat([X_numeric, X_suit, X_categorical], axis=1)
+    X = pd.concat([X_numeric, X_suit, X_categorical, X_flags, X_judge], axis=1)
 
     # Reset index for sklearn compatibility
     X = X.reset_index(drop=True)

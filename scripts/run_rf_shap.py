@@ -86,8 +86,18 @@ def main() -> None:
     train_df, test_df, cutoff = temporal_split(df)
     print(f"Temporal split: cutoff={cutoff}  train={len(train_df):,}  test={len(test_df):,}")
 
-    X_train, y_train = prepare_for_trees(train_df)
-    X_test,  y_test  = prepare_for_trees(test_df)
+    # Build judge target encoding from training data only, then apply to both splits.
+    # Each judge is mapped to their median log_los_days in the training set.
+    judge_target_map = (
+        train_df.dropna(subset=["log_los_days"])
+        .groupby("District_Judge")["log_los_days"]
+        .median()
+        .to_dict()
+    )
+    print(f"Judge target encoding: {len(judge_target_map)} judges in training set")
+
+    X_train, y_train = prepare_for_trees(train_df, target="log_los_days", judge_target_map=judge_target_map)
+    X_test,  y_test  = prepare_for_trees(test_df,  target="log_los_days", judge_target_map=judge_target_map)
     # Align test columns to train — suit features are dynamic (one suit per column),
     # so test can have new suits unseen in training or be missing some training suits.
     X_test = X_test.reindex(columns=X_train.columns, fill_value=0)
@@ -109,10 +119,12 @@ def main() -> None:
     print(f"  Training done in {train_time:.1f}s")
 
     # ── metrics ───────────────────────────────────────────────────────────────
-    y_pred = rf.predict(X_test)
-    mae  = mean_absolute_error(y_test, y_pred)
-    rmse = mean_squared_error(y_test, y_pred) ** 0.5
-    r2   = r2_score(y_test, y_pred)
+    y_pred_log  = rf.predict(X_test)
+    y_pred_days = np.exp(y_pred_log)
+    y_true_days = np.exp(y_test.values)
+    mae  = mean_absolute_error(y_true_days, y_pred_days)
+    rmse = mean_squared_error(y_true_days, y_pred_days) ** 0.5
+    r2   = r2_score(y_true_days, y_pred_days)
     print(f"\nTest metrics:  MAE={mae:.1f}  RMSE={rmse:.1f}  R²={r2:.4f}")
 
     # ── feature importance (Gini) ─────────────────────────────────────────────
@@ -129,8 +141,9 @@ def main() -> None:
     print(f"\nComputing SHAP on {min(args.shap_sample, len(X_test)):,} test rows ...")
     t1 = time.time()
     shap_sample = X_test.iloc[: args.shap_sample]
-    explainer = shap.TreeExplainer(rf)
+    explainer   = shap.TreeExplainer(rf)
     shap_values = explainer.shap_values(shap_sample)
+    # SHAP values are in log-days (model predicts log_los_days)
     print(f"  SHAP done in {time.time() - t1:.1f}s")
 
     mean_abs_shap = np.abs(shap_values).mean(axis=0)
@@ -143,7 +156,7 @@ def main() -> None:
     fig, ax = plt.subplots(figsize=(8, 5))
     top = shap_df.head(top_n)
     ax.barh(top["feature"][::-1], top["mean_abs_shap"][::-1], color="#4C72B0")
-    ax.set_xlabel("Mean |SHAP value| (days)")
+    ax.set_xlabel("Mean |SHAP value| (log-days)")
     label = {"cv": "Civil", "cr": "Criminal"}.get(args.case_type, "All")
     mdl_tag = " (excl. MDL)" if args.exclude_mdl else ""
     ax.set_title(f"RF SHAP – Top {top_n} Features  [{label}{mdl_tag}]")

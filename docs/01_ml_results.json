@@ -2,41 +2,41 @@
   "model": "RandomForest",
   "case_type": "all",
   "exclude_mdl": false,
-  "n_train": 134466,
-  "n_test": 33641,
-  "n_features": 241,
+  "n_train": 132220,
+  "n_test": 33109,
+  "n_features": 242,
   "hyperparams": {
     "n_estimators": 200,
     "max_depth": 15,
     "min_samples_leaf": 5
   },
   "metrics": {
-    "MAE": 235.76,
-    "RMSE": 350.65,
-    "R2": 0.2678
+    "MAE": 193.84,
+    "RMSE": 328.49,
+    "R2": 0.3575
   },
   "top_features_gini": [
     "n_events",
     "complexity_index",
-    "sum_attribute_hearing_conf",
     "n_motions",
-    "sum_attribute_scheduling",
     "n_activity_types",
-    "Defendants_pending_counts",
-    "has_not_applicable",
-    "suit_freq_not_applicable",
-    "activity_entropy"
+    "sum_attribute_scheduling",
+    "sum_attribute_hearing_conf",
+    "activity_entropy",
+    "Defendants_counsels_count",
+    "judge_target_encoded",
+    "sum_attribute_dispositive"
   ],
   "top_features_shap": [
     "n_events",
     "complexity_index",
+    "is_mdl_flag",
     "n_motions",
-    "sum_attribute_hearing_conf",
     "n_activity_types",
-    "suit_freq_not_applicable",
-    "has_not_applicable",
+    "sum_attribute_hearing_conf",
     "sum_attribute_scheduling",
-    "Other_courts",
-    "activity_entropy"
+    "activity_entropy",
+    "judge_target_encoded",
+    "Defendants_counsels_count"
   ]
 }
