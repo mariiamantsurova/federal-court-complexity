@@ -75,6 +75,7 @@ class CaseAcc:
     n_motions: int = 0
     attr_sums: Counter[str] = field(default_factory=Counter)
     static: dict[str, object] | None = None
+    nature_suits: set[str] = field(default_factory=set)
 
 
 def _update_case(acc: CaseAcc, grp: pd.DataFrame, attr_cols: list[str], static_cols: list[str]) -> None:
@@ -87,17 +88,22 @@ def _update_case(acc: CaseAcc, grp: pd.DataFrame, attr_cols: list[str], static_c
     if pd.notna(dmax):
         acc.max_date = dmax if acc.max_date is None else max(acc.max_date, dmax)
 
-    acc.activities.update(grp["Activity"].dropna().astype(str).value_counts().to_dict())
+    acc.activities.update(grp["Activity"].dropna().astype(str).value_counts().to_dict()) # type: ignore
     acc.n_motions += int((grp["Activity"] == "motion").sum())
 
     if attr_cols:
         true_counts = grp[attr_cols].sum(numeric_only=False)
         for col, cnt in true_counts.items():
             if cnt:
-                acc.attr_sums[col] += int(cnt)
+                acc.attr_sums[col] += int(cnt) # type: ignore
 
     if acc.static is None and static_cols:
-        acc.static = grp.iloc[0][static_cols].to_dict()
+        acc.static = grp.iloc[0][static_cols].to_dict() # type: ignore
+
+    if "nature_suit" in grp.columns:
+        acc.nature_suits.update(
+            v for v in grp["nature_suit"].dropna().astype(str).unique() if v
+        )
 
 
 def build_case_features(
@@ -117,7 +123,8 @@ def build_case_features(
         if c.startswith("attribute_") and c != "attribute_duplicates"
     ]
     static_cols = [c for c in STATIC_COLS if c in header]
-    usecols = ["ucid", "date_filed", "Activity", *attr_cols, *static_cols]
+    nature_suit_col = ["nature_suit"] if "nature_suit" in header else []
+    usecols = ["ucid", "date_filed", "Activity", *attr_cols, *static_cols, *nature_suit_col]
 
     cases: dict[str, CaseAcc] = defaultdict(CaseAcc)
     rows_read = 0
@@ -165,6 +172,7 @@ def build_case_features(
             rec.update(acc.static)
         for col, cnt in acc.attr_sums.items():
             rec[f"sum_{col}"] = cnt
+        rec["nature_suits"] = sorted(acc.nature_suits)
         records.append(rec)
 
     df = pd.DataFrame(records)

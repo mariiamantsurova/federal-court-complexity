@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import math
 from collections import Counter
+from pathlib import Path
 from typing import Optional
 
 import numpy as np
@@ -107,8 +108,9 @@ def build_suit_features_dataframe(nature_suits_series: pd.Series) -> pd.DataFram
         features = extract_suit_features(suits_array)
         suit_features_list.append(features)
 
-    # Convert to DataFrame
-    suit_features_df = pd.DataFrame(suit_features_list)
+    # Convert to DataFrame — preserve the input series' index so callers can
+    # safely concat with other DataFrames that share the same index.
+    suit_features_df = pd.DataFrame(suit_features_list, index=nature_suits_series.index)
 
     # Fill NaN with 0 (handles missing suit types)
     suit_features_df = suit_features_df.fillna(0.0)

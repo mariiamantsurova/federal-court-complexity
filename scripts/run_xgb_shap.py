@@ -32,7 +32,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import xgboost as xgb
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
 
 from src.preprocessing_trees import prepare_for_trees
 
@@ -57,6 +56,13 @@ def build_suffix(case_type: str | None, exclude_mdl: bool) -> str:
     if exclude_mdl:
         parts.append("no_mdl")
     return ("_" + "_".join(parts)) if parts else ""
+
+
+def temporal_split(df: pd.DataFrame, cutoff_quantile: float = 0.8) -> tuple:
+    """Split by case_open_date so test cases are always newer than training cases."""
+    dates = pd.to_datetime(df["case_open_date"])
+    cutoff = dates.quantile(cutoff_quantile)
+    return df[dates < cutoff].copy(), df[dates >= cutoff].copy(), cutoff.date()
 
 
 def _label(case_type: str | None, exclude_mdl: bool) -> str:
@@ -84,12 +90,13 @@ def main() -> None:
 
     # ── data ─────────────────────────────────────────────────────────────────
     df = load_data(args.case_type, args.exclude_mdl)
-    X, y = prepare_for_trees(df)
-    print(f"Feature matrix: {X.shape[0]:,} × {X.shape[1]}")
+    train_df, test_df, cutoff = temporal_split(df)
+    print(f"Temporal split: cutoff={cutoff}  train={len(train_df):,}  test={len(test_df):,}")
 
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.2, random_state=42
-    )
+    X_train, y_train = prepare_for_trees(train_df)
+    X_test,  y_test  = prepare_for_trees(test_df)
+    X_test = X_test.reindex(columns=X_train.columns, fill_value=0)
+    print(f"Feature matrix: {X_train.shape[1]} features")
 
     # ── model ─────────────────────────────────────────────────────────────────
     print(f"\nTraining XGBoost (n_estimators={args.n_estimators}) ...")
@@ -132,7 +139,7 @@ def main() -> None:
 
     mean_abs_shap = np.abs(shap_values).mean(axis=0)
     shap_df = pd.DataFrame({
-        "feature": X.columns,
+        "feature": X_train.columns,
         "mean_abs_shap": mean_abs_shap,
     }).sort_values("mean_abs_shap", ascending=False).reset_index(drop=True)
 
@@ -176,7 +183,7 @@ def main() -> None:
         "exclude_mdl": args.exclude_mdl,
         "n_train": int(len(X_train)),
         "n_test": int(len(X_test)),
-        "n_features": int(X.shape[1]),
+        "n_features": int(X_train.shape[1]),
         "hyperparams": {
             "n_estimators": args.n_estimators,
             "max_depth": 6,

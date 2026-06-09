@@ -45,7 +45,6 @@ import torch
 import torch.nn as nn
 from torch.utils.data import DataLoader, TensorDataset
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
-from sklearn.model_selection import train_test_split
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
@@ -130,7 +129,7 @@ class CourtNNHuggingFace(nn.Module):
         self.head = CourtNNBase(n_numeric + judge_embedding_dim, hidden_dim, dropout)
 
     def forward(self, numeric: torch.Tensor, judge_ids: torch.Tensor) -> torch.Tensor:
-        raw = self.judge_emb_matrix[judge_ids]   # (B, hf_dim) — lookup, no grad
+        raw = self.judge_emb_matrix[judge_ids]   # pyright: ignore[reportIndexIssue] # (B, hf_dim) — lookup, no grad
         j   = self.proj(raw)                     # (B, judge_embedding_dim)
         x   = torch.cat([numeric, j], dim=1)
         return self.head(x)
@@ -263,7 +262,23 @@ def main() -> None:
 
     # ── data ─────────────────────────────────────────────────────────────────
     df = load_data(args.case_type, args.exclude_mdl)
-    prepared_data, y = prepare_for_neural_net(df)
+
+    # Temporal 70/15/15 split: train → val → test in chronological order.
+    # Pre-filter to rows that prepare_for_neural_net would keep, so indices align.
+    df_valid = df[df["los_days"].notna() & (df["los_days"] >= 0)].copy()
+    dates = pd.to_datetime(df_valid["case_open_date"])
+    p70 = dates.quantile(0.70)
+    p85 = dates.quantile(0.85)
+    idx_train = np.where((dates < p70).values)[0] # type: ignore
+    idx_val   = np.where(((dates >= p70) & (dates < p85)).values)[0] # type: ignore
+    idx_test  = np.where((dates >= p85).values)[0] # type: ignore
+    train_cutoff_str = str(p70)[:10]
+    val_cutoff_str   = str(p85)[:10]
+    print(f"Temporal split — train: up to {train_cutoff_str}  "
+          f"val: {train_cutoff_str}–{val_cutoff_str}  test: after {val_cutoff_str}")
+    print(f"  train={len(idx_train):,}  val={len(idx_val):,}  test={len(idx_test):,}")
+
+    prepared_data, y = prepare_for_neural_net(df_valid)
 
     n_numeric     = prepared_data["numeric_features"].shape[1]
     judge_vocab   = prepared_data["judge_vocab"]
@@ -271,11 +286,6 @@ def main() -> None:
     print(f"Numeric features: {n_numeric}  |  Judge vocab: {judge_vocab_size}")
 
     numeric, judges, target = make_tensors(prepared_data, y)
-
-    # train/val/test split: 70 / 15 / 15
-    idx = np.arange(len(target))
-    idx_trainval, idx_test = train_test_split(idx, test_size=0.15, random_state=42)
-    idx_train, idx_val     = train_test_split(idx_trainval, test_size=0.15 / 0.85, random_state=42)
 
     def split(t):
         return t[idx_train], t[idx_val], t[idx_test]
@@ -401,6 +411,9 @@ def main() -> None:
         "hf_model": "sentence-transformers/all-MiniLM-L6-v2" if args.use_hf_embeddings else None,
         "case_type": args.case_type or "all",
         "exclude_mdl": args.exclude_mdl,
+        "split": "temporal",
+        "train_cutoff": train_cutoff_str,
+        "val_cutoff":   val_cutoff_str,
         "n_train": int(len(idx_train)),
         "n_val":   int(len(idx_val)),
         "n_test":  int(len(idx_test)),

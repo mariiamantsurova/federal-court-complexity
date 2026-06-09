@@ -2,9 +2,9 @@
   "model": "XGBoost",
   "case_type": "all",
   "exclude_mdl": false,
-  "n_train": 134485,
-  "n_test": 33622,
-  "n_features": 35,
+  "n_train": 134466,
+  "n_test": 33641,
+  "n_features": 241,
   "hyperparams": {
     "n_estimators": 500,
     "max_depth": 6,
@@ -12,32 +12,32 @@
     "subsample": 0.8
   },
   "metrics": {
-    "MAE": 233.97,
-    "RMSE": 466.55,
-    "R2": 0.4845
+    "MAE": 206.03,
+    "RMSE": 316.48,
+    "R2": 0.4036
   },
   "top_features_shap": [
     "n_events",
-    "Defendants_share_ind",
-    "Defendants_pending_counts",
-    "complexity_index",
-    "sum_attribute_dispositive",
+    "suit_freq_not_applicable",
+    "suit_freq_365_personal_injury-_product_liability",
     "Other_courts",
-    "sum_attribute_scheduling",
+    "sum_attribute_dispositive",
+    "suit_freq_367_personal_injury_-_health_care_pharmaceutical_personal_injury_product_liability",
     "sum_attribute_hearing_conf",
+    "has_not_applicable",
     "n_motions",
     "Defendants_counsels_count"
   ],
   "mean_abs_shap": {
-    "n_events": 229.5781,
-    "Defendants_share_ind": 33.5224,
-    "Defendants_pending_counts": 32.6153,
-    "complexity_index": 31.7938,
-    "sum_attribute_dispositive": 30.6921,
-    "Other_courts": 30.35,
-    "sum_attribute_scheduling": 29.3209,
-    "sum_attribute_hearing_conf": 28.971,
-    "n_motions": 28.6725,
-    "Defendants_counsels_count": 20.9706
+    "n_events": 268.2415,
+    "suit_freq_not_applicable": 64.8381,
+    "suit_freq_365_personal_injury-_product_liability": 40.0321,
+    "Other_courts": 39.3219,
+    "sum_attribute_dispositive": 35.5091,
+    "suit_freq_367_personal_injury_-_health_care_pharmaceutical_personal_injury_product_liability": 27.5418,
+    "sum_attribute_hearing_conf": 22.8834,
+    "has_not_applicable": 22.268,
+    "n_motions": 21.2773,
+    "Defendants_counsels_count": 18.9131
   }
 }

@@ -143,26 +143,24 @@ def _prepare_suit_embeddings(df: pd.DataFrame, max_suit_length: int = 20) -> dic
     suit_vocab = SuitVocabulary()
     suit_vocab.build(df["nature_suits"].tolist())
 
-    # Encode all cases
-    suits_encoded = []
-    suits_mask = []
+    # Pre-allocate arrays to avoid O(n) list-append overhead
+    n = len(df)
+    pad_id = suit_vocab.suit_to_id["<PAD>"]
+    unk_id = suit_vocab.suit_to_id["<UNK>"]
+    suits_arr = np.full((n, max_suit_length), pad_id, dtype=np.int64)
+    mask_arr  = np.zeros((n, max_suit_length), dtype=np.int8)
 
-    for suits_list in df["nature_suits"]:
-        encoded = suit_vocab.encode(suits_list, max_length=max_suit_length)
-        suits_encoded.append(encoded)
-
-        # Create mask (1 = real suit, 0 = padding)
+    for i, suits_list in enumerate(df["nature_suits"]):
         if suits_list:
-            mask = [1] * min(len(suits_list), max_suit_length)
-            mask += [0] * (max_suit_length - len(mask))
-        else:
-            mask = [0] * max_suit_length
-        suits_mask.append(mask)
+            trunc = suits_list[:max_suit_length]
+            ids   = [suit_vocab.suit_to_id.get(s, unk_id) for s in trunc]
+            suits_arr[i, :len(ids)] = ids
+            mask_arr[i,  :len(ids)] = 1
 
     return {
-        "suits_encoded": np.array(suits_encoded),  # (n_cases, max_suit_length)
-        "suits_mask": np.array(suits_mask),        # (n_cases, max_suit_length)
-        "suit_vocab": suit_vocab,
+        "suits_encoded": suits_arr,   # (n_cases, max_suit_length)
+        "suits_mask":    mask_arr,    # (n_cases, max_suit_length)
+        "suit_vocab":    suit_vocab,
     }
 
 

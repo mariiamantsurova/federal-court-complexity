@@ -4,13 +4,16 @@
   "hf_model": null,
   "case_type": "all",
   "exclude_mdl": false,
-  "n_train": 117674,
-  "n_val": 25216,
-  "n_test": 25217,
+  "split": "temporal",
+  "train_cutoff": "2014-02-17",
+  "val_cutoff": "2016-04-29",
+  "n_train": 117660,
+  "n_val": 25196,
+  "n_test": 25251,
   "n_numeric_features": 29,
   "judge_vocab_size": 94,
   "hyperparams": {
-    "epochs_run": 40,
+    "epochs_run": 32,
     "batch_size": 1024,
     "lr": 0.001,
     "hidden_dim": 128,
@@ -18,10 +21,10 @@
     "dropout": 0.3
   },
   "metrics": {
-    "MAE": 235.7,
-    "RMSE": 469.23,
-    "R2": 0.4688
+    "MAE": 222.23,
+    "RMSE": 366.26,
+    "R2": -0.0983
   },
-  "best_val_rmse": 449.36,
-  "train_time_s": 57.9
+  "best_val_rmse": 462.01,
+  "train_time_s": 45.5
 }
