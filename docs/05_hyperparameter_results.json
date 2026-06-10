@@ -1,0 +1,178 @@
+{
+  "search_config": {
+    "search_sample": 25000,
+    "cv_folds": 3,
+    "n_iter": 15,
+    "random_seed": 42,
+    "target": "log_los_days",
+    "metrics_scale": "original_days (back-transformed via exp)"
+  },
+  "RandomForest": {
+    "best_params": {
+      "n_estimators": 100,
+      "min_samples_leaf": 2,
+      "max_features": 0.4,
+      "max_depth": 20
+    },
+    "best_cv_mae_sample": 223.18,
+    "final_metrics_full_data": {
+      "MAE": 167.65,
+      "RMSE": 269.32,
+      "R2": 0.5681
+    }
+  },
+  "XGBoost": {
+    "best_params": {
+      "subsample": 0.8,
+      "reg_alpha": 0.0,
+      "n_estimators": 500,
+      "min_child_weight": 10,
+      "max_depth": 10,
+      "learning_rate": 0.03
+    },
+    "best_cv_mae_sample": 218.21,
+    "final_metrics_full_data": {
+      "MAE": 172.28,
+      "RMSE": 303.82,
+      "R2": 0.4504
+    }
+  },
+  "NeuralNet": {
+    "best_config_name": "baseline",
+    "best_params": {
+      "hidden_dim": 128,
+      "emb_dim": 32,
+      "dropout": 0.3,
+      "lr": 0.001,
+      "batch_size": 1024
+    },
+    "search_configs": [
+      {
+        "name": "small",
+        "hidden_dim": 64,
+        "emb_dim": 16,
+        "dropout": 0.2,
+        "lr": 0.001,
+        "batch_size": 1024,
+        "test_mae": 200.41,
+        "test_rmse": 350.94,
+        "test_r2": -0.0146,
+        "best_val_loss": 0.537461,
+        "epochs_run": 20
+      },
+      {
+        "name": "baseline",
+        "hidden_dim": 128,
+        "emb_dim": 32,
+        "dropout": 0.3,
+        "lr": 0.001,
+        "batch_size": 1024,
+        "test_mae": 189.16,
+        "test_rmse": 334.82,
+        "test_r2": 0.0765,
+        "best_val_loss": 0.509441,
+        "epochs_run": 20
+      },
+      {
+        "name": "large",
+        "hidden_dim": 256,
+        "emb_dim": 32,
+        "dropout": 0.3,
+        "lr": 0.001,
+        "batch_size": 1024,
+        "test_mae": 219.64,
+        "test_rmse": 376.66,
+        "test_r2": -0.1688,
+        "best_val_loss": 0.476287,
+        "epochs_run": 18
+      },
+      {
+        "name": "hi_dropout",
+        "hidden_dim": 128,
+        "emb_dim": 32,
+        "dropout": 0.5,
+        "lr": 0.001,
+        "batch_size": 1024,
+        "test_mae": 217.86,
+        "test_rmse": 356.84,
+        "test_r2": -0.049,
+        "best_val_loss": 0.668985,
+        "epochs_run": 20
+      },
+      {
+        "name": "lo_lr",
+        "hidden_dim": 128,
+        "emb_dim": 32,
+        "dropout": 0.3,
+        "lr": 0.0005,
+        "batch_size": 1024,
+        "test_mae": 261.06,
+        "test_rmse": 409.26,
+        "test_r2": -0.3799,
+        "best_val_loss": 0.841898,
+        "epochs_run": 20
+      },
+      {
+        "name": "hi_lr",
+        "hidden_dim": 128,
+        "emb_dim": 32,
+        "dropout": 0.3,
+        "lr": 0.005,
+        "batch_size": 1024,
+        "test_mae": 209.6,
+        "test_rmse": 359.85,
+        "test_r2": -0.0668,
+        "best_val_loss": 0.485251,
+        "epochs_run": 9
+      },
+      {
+        "name": "big_batch",
+        "hidden_dim": 128,
+        "emb_dim": 32,
+        "dropout": 0.3,
+        "lr": 0.001,
+        "batch_size": 2048,
+        "test_mae": 199.96,
+        "test_rmse": 349.57,
+        "test_r2": -0.0067,
+        "best_val_loss": 0.548164,
+        "epochs_run": 20
+      },
+      {
+        "name": "large_emb",
+        "hidden_dim": 128,
+        "emb_dim": 64,
+        "dropout": 0.3,
+        "lr": 0.001,
+        "batch_size": 1024,
+        "test_mae": 190.69,
+        "test_rmse": 335.68,
+        "test_r2": 0.0717,
+        "best_val_loss": 0.496271,
+        "epochs_run": 20
+      }
+    ],
+    "final_metrics_full_epochs": {
+      "MAE": 193.64999389648438,
+      "RMSE": 327.56,
+      "R2": 0.1161
+    }
+  },
+  "default_script_metrics": {
+    "RF (default)": {
+      "MAE": 193.84,
+      "RMSE": 328.49,
+      "R2": 0.3575
+    },
+    "XGB (default)": {
+      "MAE": 172.58,
+      "RMSE": 296.87,
+      "R2": 0.4753
+    },
+    "NN (default)": {
+      "MAE": 192.4,
+      "RMSE": 325.7,
+      "R2": 0.1261
+    }
+  }
+}
