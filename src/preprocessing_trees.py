@@ -6,16 +6,18 @@ Features:
   - Core complexity metrics: n_events, n_activity_types, n_motions, activity_entropy
   - Case attributes: plaintiffs_count, Defendants_count, party counts, etc.
   - Suit structure: n_unique_suits, suit_entropy, has_contract, has_ip, ...
+  - Case flags: is_cv (case_type binary), is_mdl_flag
   - City (one-hot encoded)
+  - District_Judge (target encoding when judge_target_map provided)
 
 Excluded:
-  - case_type (target of case_type split models)
-  - District_Judge (high cardinality, save for judge-level modeling)
+  - District_Judge raw string (replaced by target encoding)
   - nature_suit (raw categorical, collinear with case_type)
-    BUT INCLUDE suit structure features (derived from nature_suits array)
+    BUT suit structure features are extracted from nature_suits array
 
 Usage:
   X, y = prepare_for_trees(df)
+  X, y = prepare_for_trees(df, target="log_los_days", judge_target_map=train_judge_map)
 """
 from __future__ import annotations
 
@@ -70,20 +72,18 @@ PARTY_TYPES = [
     "Party_Trustee",
 ]
 
-# Categorical (only city, one-hot encoded)
+# Categorical (one-hot encoded; case_type handled separately as binary is_cv)
 CATEGORICAL_COLS = ["city"]
 
-# Excluded features
+# Excluded features (documentation — not used in logic directly)
 EXCLUDED_COLS = [
     "ucid",
     "case_open_date",
-    "case_type",     # Handled explicitly via _prepare_case_flags (binary is_cv feature)
-    "District_Judge",  # Handled explicitly via _prepare_judge_feature (target encoding)
-    "is_mdl",        # Handled explicitly via _prepare_case_flags
-    "los_days",      # Target variable
-    "log_los_days",  # Target variable
-    "nature_suit",   # Raw categorical, collinear with case_type
-    "nature_suits",  # Raw array (we extract features from it)
+    "District_Judge",  # Handled via _prepare_judge_feature (target encoding)
+    "los_days",        # Target variable
+    "log_los_days",    # Target variable
+    "nature_suit",     # Raw categorical, collinear with case_type
+    "nature_suits",    # Raw array (features extracted separately)
 ]
 
 # Sum attribute columns (event type aggregations) - optional, sparse

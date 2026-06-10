@@ -77,6 +77,8 @@ EMBEDDING_FEATURES = {
 # Other numeric (can keep as-is)
 OTHER_NUMERIC = [
     "Magistrate_Judge",  # Binary, can keep numeric
+    "is_mdl",            # Binary MDL flag
+    "case_type_cv",      # Binary: 1=civil, 0=criminal (derived from case_type string)
 ]
 
 TARGET = "los_days"
@@ -203,6 +205,10 @@ def prepare_for_neural_net(
     valid_idx = y.notna() & (y >= 0)
     df = df[valid_idx].copy()
     y = y[valid_idx].copy()
+
+    # Derive binary features from string columns so they can be StandardScaled
+    if "case_type" in df.columns:
+        df["case_type_cv"] = (df["case_type"] == "cv").astype(np.float32)
 
     # 1. Numeric features (scaled)
     numeric_cols = _get_numeric_feature_cols(df)
