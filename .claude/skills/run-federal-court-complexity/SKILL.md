@@ -5,9 +5,13 @@ description: Run, build, test, or smoke-test the federal court complexity pipeli
 
 # Federal Court Complexity Pipeline
 
-Python ML pipeline modeling case complexity vs. LOS (Length of Stay) in the Northern District of Illinois federal courts.
+**Research question:** Does dynamic judge workload at case opening predict *procedural complexity* (`complexity_index`) beyond what basic case filing attributes already explain?
 
-**Stack:** pandas, scikit-learn, XGBoost, SHAP, statsmodels, PyTorch, sentence-transformers, pm4py  
+Two models are compared for civil and criminal cases separately:
+- **Model A** — filing features only (~30 case attributes known at filing time)
+- **Model B** — filing features + `judge_workload_at_open` (concurrent open cases for that judge on the filing date)
+
+**Stack:** pandas, scikit-learn, XGBoost, SHAP, scipy  
 **Venv:** `.venv/` at project root — always use `.venv/bin/python3`  
 **Data:** Pre-built parquet files live in `data/` (no raw CSV needed for most tasks)
 
@@ -15,279 +19,187 @@ Python ML pipeline modeling case complexity vs. LOS (Length of Stay) in the Nort
 
 ## Prerequisites
 
-- Python 3.11 (via Anaconda at `/opt/anaconda3`) — system Python lacks xgboost/shap
 - `.venv/` already exists and is fully installed
-- `data/case_features.parquet` (168 k rows) — already present, not in git
-- `data/aggregations/by_case.parquet`, `by_judge.parquet` — already present
-- `Event Log.csv` (~2.7 GB) — required **only** for `scripts/build_features.py` (Step 1 rebuild)
+- `data/case_features.parquet` (168k rows) — already present, not in git
+- `data/aggregations/by_case.parquet` — already present (has `complexity_index` column added by `build_aggregations.py`)
+- `Event Log.csv` (~2.7 GB) — required **only** for Step 1 rebuild from scratch
 
 ---
 
-## Setup (one time, already done)
+## Scripts that exist and work
+
+| Path | Purpose |
+|---|---|
+| `scripts/build_features.py` | Step 1: `Event Log.csv` → `Event Log_model.csv` |
+| `src/build_case_features.py` | Step 2: `Event Log_model.csv` → `data/case_features.parquet` |
+| `src/build_aggregations.py` | Step 3: `case_features.parquet` → `data/aggregations/by_case.parquet` |
+| `scripts/run_baseline.py` | Judge-median baseline for `complexity_index` |
+| `scripts/run_rf_shap.py` | RF: Model A vs Model B, with SHAP |
+| `scripts/run_xgb_shap.py` | XGBoost: Model A vs Model B, with SHAP |
+| `scripts/run_pipeline.py` | Orchestrates all steps end-to-end |
+| `src/features.py` | Feature definitions, `TARGET = "complexity_index"`, `add_derived_columns()` |
+| `src/preprocessing_trees.py` | Builds `(X, y)` for tree models; `include_workload=True` for Model B |
+| `src/judge_workload.py` | Computes `judge_workload_at_open` from `case_open_date` + `los_days` |
+| `src/suit_features.py` | Extracts suit-structure features from `nature_suits` array |
+
+**Deleted (no longer exist):** `scripts/run_neural_net.py`, `src/neural_net_model.py`, `src/preprocessing_neural_net.py`, `src/judge_vocabulary.py`, `notebooks/05_hyperparameter_tuning.ipynb`
+
+---
+
+## Run the pipeline
+
+### Full pipeline (from aggregations onward)
 
 ```bash
 cd "/Users/mariamantsurova/Desktop/University/3rd Year/federal-court-complexity"
-python3 -m venv .venv
-source .venv/bin/activate
-pip install -r requirements.txt
+
+# Skip data rebuild steps (parquets already exist), run both models for cv + cr
+.venv/bin/python3 scripts/run_pipeline.py --skip-clean --skip-case --skip-agg
 ```
 
----
-
-## What scripts actually exist
-
-The README references `scripts/run_pipeline.sh` — **not present** (no end-to-end shell runner exists yet).
-
-Scripts that **exist and work**:
-
-| Path                              | Purpose                                                                              |
-| --------------------------------- | ------------------------------------------------------------------------------------ |
-| `scripts/build_features.py`       | Step 1: `Event Log.csv` → `Event Log_model.csv` (needs 2.7 GB CSV)                  |
-| `scripts/run_rf_shap.py`          | **RF + SHAP** — trains Random Forest, produces importance CSV + SHAP bar plot        |
-| `scripts/run_xgb_shap.py`        | **XGBoost + SHAP** — trains XGBoost, produces beeswarm + bar SHAP plots              |
-| `scripts/run_neural_net.py`       | **Neural Net** — custom learned embeddings or HF sentence-transformer judge embeddings |
-| `src/build_case_features.py`      | Step 2: events → `data/case_features.parquet` (needs `Event Log_model.csv`)         |
-| `src/build_aggregations.py`       | Step 3: cases → `data/aggregations/` parquets                                        |
-| `src/preprocessing_trees.py`      | Feature matrix builder for RF / XGBoost                                              |
-| `src/preprocessing_neural_net.py` | Feature matrix + judge/suit encoding for neural net                                  |
-| `src/neural_net_model.py`         | PyTorch `CourtCaseNeuralNet` and `CourtCaseNeuralNetLSTM` modules                    |
-| `src/suit_features.py`            | Suit-type feature engineering                                                        |
-| `src/judge_vocabulary.py`         | Judge name → integer embedding index                                                 |
-
-**Note:** `src/features.py` is imported by `build_aggregations.py` but does not exist — that script will error on import. Use `preprocessing_trees.py` directly instead.
-
----
-
-## Run the pipeline (agent path)
-
-### Random Forest + SHAP
+### Individual model scripts
 
 ```bash
-cd "/Users/mariamantsurova/Desktop/University/3rd Year/federal-court-complexity"
-
-# All cases (pooled)
-.venv/bin/python3 scripts/run_rf_shap.py
-
-# Civil only
+# Random Forest — civil cases
 .venv/bin/python3 scripts/run_rf_shap.py --case-type cv
 
-# Criminal only, excluding MDL cases
-.venv/bin/python3 scripts/run_rf_shap.py --case-type cr --exclude-mdl
-```
+# Random Forest — criminal cases
+.venv/bin/python3 scripts/run_rf_shap.py --case-type cr
 
-Outputs: `docs/01_ml_results{suffix}.json`, `docs/01_feature_importance{suffix}.csv`, `reports/figures/01_rf_feature_importance{suffix}.png`
-
-Verified results (pooled, n_estimators=200, 2026-06-05):
-```
-MAE=239.9  RMSE=473.2  R²=0.4698
-Top SHAP: n_events, complexity_index, sum_attribute_hearing_conf, n_motions, n_activity_types
-```
-
-### XGBoost + SHAP
-
-```bash
-# All cases
-.venv/bin/python3 scripts/run_xgb_shap.py
-
-# Civil only
+# XGBoost — civil cases
 .venv/bin/python3 scripts/run_xgb_shap.py --case-type cv
 
-# With MDL exclusion
-.venv/bin/python3 scripts/run_xgb_shap.py --exclude-mdl
+# XGBoost — criminal cases
+.venv/bin/python3 scripts/run_xgb_shap.py --case-type cr
 ```
 
-Outputs: `docs/02_xgb_shap_results{suffix}.json`, `docs/02_xgb_shap_importance{suffix}.csv`, `reports/figures/02_xgb_shap_bar{suffix}.png`, `reports/figures/02_xgb_shap_beeswarm{suffix}.png`
+Each script runs **both Model A and Model B** and reports `workload_mae_improvement`.
 
-Verified results (pooled, n_estimators=500, 2026-06-05):
-```
-MAE=242.9  RMSE=475.0  R²=0.4657
-Top SHAP: n_events, sum_attribute_hearing_conf, complexity_index, Defendants_share_ind, Defendants_pending_counts
-```
+Outputs:
+- `docs/01_rf_results_{cv|cr}.json` — MAE, R², top SHAP features, model A vs B comparison
+- `docs/02_xgb_results_{cv|cr}.json` — same for XGBoost
+- `reports/figures/01_rf_shap_model_*.png` — SHAP bar plots
+- `reports/figures/02_xgb_shap_*.png` — SHAP bar + beeswarm plots
 
-### Neural Network
-
-Two judge-representation modes, otherwise identical architecture:
-
-**Custom (learned embedding)** — judge IDs embedded from scratch:
-```bash
-.venv/bin/python3 scripts/run_neural_net.py
-.venv/bin/python3 scripts/run_neural_net.py --case-type cv
-```
-
-**HuggingFace (sentence-transformers/all-MiniLM-L6-v2)** — pretrained 384-dim judge name embeddings, projected to 16-dim via trainable linear layer, then frozen:
-```bash
-.venv/bin/python3 scripts/run_neural_net.py --use-hf-embeddings
-.venv/bin/python3 scripts/run_neural_net.py --use-hf-embeddings --case-type cv
-```
-
-Key flags:
-```
---epochs N          (default 40)
---batch-size N      (default 1024; use 2048 for speed on MPS/GPU)
---lr FLOAT          (default 1e-3)
---hidden-dim N      (default 128)
---embedding-dim N   (default 16, judge embedding output dim)
---patience N        (default 8, early stopping)
-```
-
-Outputs: `docs/04_neural_net_results{suffix}.json`, `docs/04_nn_model{suffix}.pt`, `reports/figures/04_nn_loss_curve{suffix}.png`
-
-Verified results (pooled, 40 epochs, batch 2048, MPS, 2026-06-05):
-```
-Custom embeddings:  MAE=247.5  RMSE=522.4  R²=0.3417  (54s)
-HF embeddings:      MAE=246.3  RMSE=519.8  R²=0.3482  (62s)
-```
-Note: model still improving at epoch 40; run with `--epochs 80` for better convergence. Tree models outperform NN on this tabular dataset (expected).
-
-### Run Step 3 — rebuild aggregations (needs case_features.parquet)
+### Baseline
 
 ```bash
-# build_aggregations.py imports 'features' module which doesn't exist.
-# When features.py is created, run:
-# .venv/bin/python3 src/build_aggregations.py
+.venv/bin/python3 scripts/run_baseline.py --case-type cv
+.venv/bin/python3 scripts/run_baseline.py --case-type cr
 ```
 
-### Run Step 1 (only if Event Log.csv is present)
-
-```bash
-ls -lh "Event Log.csv"   # check it's there (~2.7 GB)
-.venv/bin/python3 scripts/build_features.py
-```
+Output: `docs/00_baseline_results_{cv|cr}.json`
 
 ---
 
-## Run (human path)
-
-```bash
-source .venv/bin/activate
-jupyter notebook notebooks/00_eda.ipynb   # EDA
-jupyter notebook notebooks/01_aggregated.ipynb
-```
-
----
-
-## Direct module invocation
-
-Import and call internal code without running the full pipeline:
+## Smoke-test preprocessing
 
 ```bash
 .venv/bin/python3 -c "
 import sys; sys.path.insert(0, '.')
-from src.preprocessing_trees import prepare_for_trees
 import pandas as pd
+from src.features import add_derived_columns
+from src.preprocessing_trees import prepare_for_trees
+
 df = pd.read_parquet('data/aggregations/by_case.parquet')
-X, y = prepare_for_trees(df)
-print(X.shape, X.columns.tolist()[:5])
+df = add_derived_columns(df)
+cv = df[df['case_type'] == 'cv']
+
+X_a, y = prepare_for_trees(cv, include_workload=False)
+print('Model A:', X_a.shape, '  target median:', round(y.median(), 3))
 "
 ```
 
-```bash
-.venv/bin/python3 -c "
-import sys; sys.path.insert(0, '.')
-from src.neural_net_model import CourtCaseNeuralNet
-import torch
-m = CourtCaseNeuralNet(n_numeric_features=30, judge_vocab_size=100, suit_vocab_size=50)
-print(m)
-"
-```
+Expected: `Model A: (151640, 233)  target median: ~-0.06`
 
 ---
 
 ## Preprocessing summary
 
-### Random Forest + SHAP and XGBoost + SHAP
+### Target
 
-Both use `src/preprocessing_trees.py` → `prepare_for_trees(df)`.  
-Input: `data/aggregations/by_case.parquet`. Output: `(X, y)` — 168 k rows × ~35 features, target = `los_days`.
+`complexity_index` — mean z-score of `n_events`, `n_activity_types`, `n_motions`, `activity_entropy`.  
+Computed in `src/features.py → add_derived_columns()`. Already present in `data/aggregations/by_case.parquet`.
 
-**Feature groups included:**
+**These metrics are NEVER input features** — they are retrospective (measured after case closes). Using them as features would be endogenous to the target.
 
-| Group                   | Features                                                                                                                                                                                                                                                                                                        | Notes                                                        |
-| ----------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
-| Complexity core         | `n_events`, `n_activity_types`, `n_motions`, `activity_entropy`, `complexity_index`                                                                                                                                                                                                                             | Always included                                              |
-| Case / party attributes | `plaintiffs_count`, `plaintiffs_share_ind/pro_se/pro_hac_vice`, `plaintiffs_counsels_count`, `Defendants_count`, `Defendants_share_ind/pro_se/pro_hac_vice`, `Defendants_counsels_count`, `Defendants_pending_counts`, `Defendants_terminated_counts`, `Other_courts`, `related_case_count`, `Magistrate_Judge` | Numeric; `Magistrate_Judge` treated as boolean integer       |
-| Party type counts       | `Party_Amicus`, `Party_Counter_Claimant`, `Party_Counter_Defendant`, `Party_Court_Monitor`, `Party_Intervenor`, `Party_Material_Witness`, `Party_Third_Party_Defendant`, `Party_Third_Party_Plaintiff`, `Party_Trustee`                                                                                         | All numeric                                                  |
-| Event-type aggregations | `sum_attribute_scheduling`, `sum_attribute_hearing_conf`, `sum_attribute_dismissal_other`, `sum_attribute_dispositive`, `sum_attribute_opening`                                                                                                                                                                 | Sparse counts                                                |
-| Suit structure          | `n_unique_suits`, `suit_entropy`, `is_multisuit`, `suit_dominance`, `has_<suittype>`, `suit_freq_<suittype>`                                                                                                                                                                                                    | Derived from `nature_suits` array via `src/suit_features.py` |
-| City                    | One-hot encoded (drop first)                                                                                                                                                                                                                                                                                    | `city` column                                                |
+### Feature groups (Model A)
 
-**Excluded:** `ucid`, `case_open_date`, `case_type`, `District_Judge`, `is_mdl`, `los_days`, `log_los_days`, `nature_suit`, `nature_suits`
+| Group | Features |
+|---|---|
+| Plaintiff attributes | `plaintiffs_count`, `plaintiffs_share_ind/pro_se/pro_hac_vice`, `plaintiffs_counsels_count` |
+| Defendant attributes | `Defendants_count`, `Defendants_share_ind/pro_se/pro_hac_vice`, `Defendants_counsels_count`, `Defendants_pending_counts`, `Defendants_terminated_counts` |
+| Case structure | `Other_courts`, `related_case_count`, `Magistrate_Judge` (boolean) |
+| Party types | `Party_Amicus/Counter_Claimant/Counter_Defendant/Court_Monitor/Intervenor/Material_Witness/Third_Party_Defendant/Third_Party_Plaintiff/Trustee` |
+| Suit structure | `n_unique_suits`, `suit_entropy`, `is_multisuit`, `suit_dominance`, `has_<suit>`, `suit_freq_<suit>` (from `nature_suits`) |
+| Case flags | `is_cv` (binary), `is_mdl_flag` (binary) |
+| City | One-hot encoded |
 
-**Imputation:** median for all numeric columns (via `SimpleImputer`)  
-**Scaling:** none by default (trees are scale-invariant); `scale=True` applies `StandardScaler`  
-**SHAP:** `shap.TreeExplainer` — works natively with both RF and XGBoost; produces per-feature attributions on the same feature matrix
+### Model B adds
+
+| Feature | Source |
+|---|---|
+| `judge_workload_at_open` | `src/judge_workload.py` — number of concurrent open cases for the same judge on `case_open_date` |
+
+### Explicitly excluded from X
+
+`n_events`, `n_activity_types`, `n_motions`, `activity_entropy`, `complexity_index` (→ these are the target),  
+`sum_attribute_*` (retrospective event counts),  
+`los_days`, `log_los_days` (outcome, not input),  
+`ucid`, `case_open_date`, `District_Judge` (identifiers)
 
 ---
 
-### Neural Network (`CourtCaseNeuralNet`)
+## Judge workload feature
 
-Uses `src/preprocessing_neural_net.py` → `prepare_for_neural_net(df)`.  
-Returns a dict of tensors (not a single DataFrame) + `y`.
-
-**Three input streams:**
-
-| Stream           | Source                                                                                         | Processing                                                                                                                                           |
-| ---------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Numeric features | Same complexity + case attributes + party types as trees (no city, no suit structure features) | Median imputation → `StandardScaler` → `float32` array of shape `(n_cases, 29)`                                                                      |
-| Judge embedding  | `District_Judge` column                                                                        | `JudgeVocabulary` encodes each judge name to an integer ID (vocab = 93 judges + `<UNK>`); stored as `(n_cases,)` int array                           |
-| Suit embedding   | `nature_suits` array column                                                                    | `SuitVocabulary` encodes each suit type to an integer; sequences padded/truncated to `max_suit_length=20`; stored as `(n_cases, 20)` + a binary mask |
-
-**Key difference from trees:** no one-hot encoding — `District_Judge` and suit types go into learned embedding layers, not dummy columns.
-
-**Architecture (`CourtCaseNeuralNet`):**
-
-```
-numeric (29) ──────────────────────────────┐
-judge_id (1) → Embedding(93, 16) ──────────┼─→ cat → FC(→128) → BN → ReLU → Dropout(0.3)
-suits (20,)  → Embedding(vocab,16)          │                  → FC(→64)  → BN → ReLU → Dropout
-               + masked mean-pool → (16) ──┘                  → FC(→32)  → BN → ReLU → Dropout
-                                                               → FC(→1)   = LOS prediction
-```
-
-Variant `CourtCaseNeuralNetLSTM` replaces masked mean-pooling over suit embeddings with a 2-layer LSTM, using the final hidden state as the suit representation.
-
-**Invoke preprocessing:**
+`src/judge_workload.py → add_judge_workload(df)` adds `judge_workload_at_open`:
 
 ```bash
 .venv/bin/python3 -c "
 import sys; sys.path.insert(0, '.')
 import pandas as pd
-from src.preprocessing_neural_net import prepare_for_neural_net
+from src.features import add_derived_columns
+from src.judge_workload import add_judge_workload
+
 df = pd.read_parquet('data/aggregations/by_case.parquet')
-data, y = prepare_for_neural_net(df)
-print('numeric:', data['numeric_features'].shape)
-print('judges vocab size:', data['judges_vocab_size'])
-print('suits encoded:', data['suits_encoded'].shape)
+df = add_derived_columns(df)
+df = add_judge_workload(df)
+print(df['judge_workload_at_open'].describe())
 "
 ```
 
-Expected:
+Note: runs a vectorised interval-overlap computation grouped by judge. With 168k cases it takes ~30–60s.
 
-```
-numeric: (168107, 29)
-judges vocab size: 93
-suits encoded: (168107, 20)
-```
+---
+
+## Data files
+
+| File | Needed? | Notes |
+|---|---|---|
+| `data/case_features.parquet` | Yes | Input for `build_aggregations.py` |
+| `data/aggregations/by_case.parquet` | Yes | Main model input (has `complexity_index`) |
+| `data/aggregations/by_judge.parquet` | No | Not used by any current script |
+| `Event Log.csv` | Only for Step 1 | ~2.7 GB, not in repo |
+| `Event Log_model.csv` | Only for Step 2 | Built by `build_features.py` |
 
 ---
 
 ## Gotchas
 
-- **`features.py` is missing.** `src/build_aggregations.py` does `from features import ...` but no such file exists. The script will crash on import. Use `preprocessing_trees.py` directly instead.
-- **`sys.path.insert(0, '.')` is required.** Running `src/build_aggregations.py` or any `src/` script needs the project root on the path. The scripts do this themselves; when importing in a `-c` snippet, add it manually.
-- **`scripts/run_pipeline.sh` does not exist.** The README describes a full pipeline runner that has not been written yet.
-- **`.venv/bin/python3` is the only working interpreter.** System Python at `/opt/anaconda3/bin/python3` lacks xgboost and shap.
-- **`data/aggregations/by_case.parquet` has `complexity_index`.** `data/case_features.parquet` does not — it's added by the aggregation step. Always use `by_case.parquet` as the model input.
-- **Import path for `src/suit_features.py`:** imported as `from src.suit_features import ...` (with `src.` prefix) when running from project root.
+- **`.venv/bin/python3` is required.** System Python lacks xgboost and shap.
+- **`data/aggregations/by_case.parquet` has `complexity_index`; `data/case_features.parquet` does not.** Always call `add_derived_columns()` after loading, or use `by_case.parquet` which already has it.
+- **`add_judge_workload()` must be called before `temporal_split()`** in model scripts — the workload is computed from the full dataset (needs all cases to count overlapping open cases).
+- **Models are always run per case type** (`--case-type cv` or `--case-type cr`). Running pooled (no flag) is supported but not the primary analysis.
+- **`sys.path.insert(0, str(ROOT))` is required** when calling `src/` modules from `-c` snippets.
 
 ---
 
 ## Troubleshooting
 
-| Error                                                      | Fix                                                                        |
-| ---------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `ModuleNotFoundError: No module named 'features'`          | `features.py` missing — use `preprocessing_trees.py` directly              |
-| `ModuleNotFoundError: No module named 'xgboost'`           | Use `.venv/bin/python3`, not system python3                                |
-| `FileNotFoundError: data/aggregations/by_case.parquet`     | Run `src/build_aggregations.py` first (needs `data/case_features.parquet`) |
-| `FileNotFoundError: Event Log.csv`                         | Raw event log not in repo — needed only for Step 1                         |
-| `ModuleNotFoundError: No module named 'src.suit_features'` | Add `sys.path.insert(0, str(ROOT))` or run from project root               |
+| Error | Fix |
+|---|---|
+| `ModuleNotFoundError: No module named 'xgboost'` | Use `.venv/bin/python3`, not system python3 |
+| `KeyError: 'complexity_index'` | Call `add_derived_columns(df)` before `prepare_for_trees()` |
+| `FileNotFoundError: data/aggregations/by_case.parquet` | Run `src/build_aggregations.py` first |
+| `FileNotFoundError: Event Log.csv` | Raw log not in repo — needed only for Step 1 rebuild |
+| `ModuleNotFoundError: No module named 'src.suit_features'` | Run from project root or add `sys.path.insert(0, str(ROOT))` |
