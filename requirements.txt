@@ -11,3 +11,6 @@ shap>=0.44
 pm4py>=2.7
 torch>=2.0
 sentence-transformers>=2.7
+plotly>=5.0
+nbformat>=4.2.0
+rapidfuzz>=3.0

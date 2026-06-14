@@ -5,201 +5,175 @@ description: Run, build, test, or smoke-test the federal court complexity pipeli
 
 # Federal Court Complexity Pipeline
 
-**Research question:** Does dynamic judge workload at case opening predict *procedural complexity* (`complexity_index`) beyond what basic case filing attributes already explain?
+**Research question:** Does dynamic judge workload at case opening predict _procedural complexity_ (`ed`) beyond what basic case filing attributes already explain?
 
-Two models are compared for civil and criminal cases separately:
-- **Model A** — filing features only (~30 case attributes known at filing time)
-- **Model B** — filing features + `judge_workload_at_open` (concurrent open cases for that judge on the filing date)
+**Target:** `ed` (event density) = `n_activity_types / n_events` — measures how diverse the procedural activity is relative to total docket size. Ranges 0–1; higher = more varied procedure.
 
-**Stack:** pandas, scikit-learn, XGBoost, SHAP, scipy  
+Two models are compared:
+
+- **Model A** — filing features only (case attributes known at opening)
+- **Model B** — filing features + judge workload features (`judge_open_at_filing`, `judge_opened_30d`, `judge_closed_30d`)
+
+**Stack:** pandas, scikit-learn, XGBoost, SHAP, PyTorch, scipy  
 **Venv:** `.venv/` at project root — always use `.venv/bin/python3`  
-**Data:** Pre-built parquet files live in `data/` (no raw CSV needed for most tasks)
+**Raw data:** `Event Log.csv` (~2.7 GB) at project root
 
 ---
 
-## Prerequisites
+## Files that exist and work
 
-- `.venv/` already exists and is fully installed
-- `data/case_features.parquet` (168k rows) — already present, not in git
-- `data/aggregations/by_case.parquet` — already present (has `complexity_index` column added by `build_aggregations.py`)
-- `Event Log.csv` (~2.7 GB) — required **only** for Step 1 rebuild from scratch
+| Path                                | Purpose                                                                 |
+| ----------------------------------- | ----------------------------------------------------------------------- |
+| `notebooks/00_eda.ipynb`            | EDA + data pipeline: `Event Log.csv` → `data/by_case.parquet`           |
+| `src/judge_workload.py`             | Computes `judge_open_at_filing`, `judge_opened_30d`, `judge_closed_30d` |
+| `data/by_case.parquet`              | Case-level model input (built by notebook cell 30)                      |
+| `data/aggregations/by_case.parquet` | Older aggregation (may be stale)                                        |
+| `data/district_judge_lookup.json`   | Maps `District_Judge_idx` integers → judge ID strings                   |
 
----
-
-## Scripts that exist and work
-
-| Path | Purpose |
-|---|---|
-| `scripts/build_features.py` | Step 1: `Event Log.csv` → `Event Log_model.csv` |
-| `src/build_case_features.py` | Step 2: `Event Log_model.csv` → `data/case_features.parquet` |
-| `src/build_aggregations.py` | Step 3: `case_features.parquet` → `data/aggregations/by_case.parquet` |
-| `scripts/run_baseline.py` | Judge-median baseline for `complexity_index` |
-| `scripts/run_rf_shap.py` | RF: Model A vs Model B, with SHAP |
-| `scripts/run_xgb_shap.py` | XGBoost: Model A vs Model B, with SHAP |
-| `scripts/run_pipeline.py` | Orchestrates all steps end-to-end |
-| `src/features.py` | Feature definitions, `TARGET = "complexity_index"`, `add_derived_columns()` |
-| `src/preprocessing_trees.py` | Builds `(X, y)` for tree models; `include_workload=True` for Model B |
-| `src/judge_workload.py` | Computes `judge_workload_at_open` from `case_open_date` + `los_days` |
-| `src/suit_features.py` | Extracts suit-structure features from `nature_suits` array |
-
-**Deleted (no longer exist):** `scripts/run_neural_net.py`, `src/neural_net_model.py`, `src/preprocessing_neural_net.py`, `src/judge_vocabulary.py`, `notebooks/05_hyperparameter_tuning.ipynb`
+**No model scripts exist yet** — model training has not been implemented. Only EDA and preprocessing are complete.
 
 ---
 
-## Run the pipeline
+## Data pipeline (notebook `00_eda.ipynb`)
 
-### Full pipeline (from aggregations onward)
+The notebook builds `data/by_case.parquet` from the raw event log:
+
+1. **Chunked load** (cell 8): reads `Event Log.csv` in 250k-row chunks
+   - Keeps only `case_status == "closed"` rows
+   - `District_Judge` NaN → `"Unknown"`; multi-judge rows (comma-separated) are **dropped**
+   - `Magistrate_Judge` → boolean (True if a real judge name is present)
+2. **Case-level aggregation** (cell 9):
+   - `n_events` = total docket entries per case
+   - `n_activity_types` = unique activity types per case
+   - `ed` = `n_activity_types / n_events` ← **target**
+   - `case_open_date` = min `date_filed`, `case_close_date` = max `date_filed`
+3. **Encoding & save** (cells 29–30):
+   - `District_Judge` → `District_Judge_idx` (label encoding, lookup in `data/district_judge_lookup.json`)
+   - `city` → one-hot columns
+   - log1p on: `plaintiffs_count`, `plaintiffs_counsels_count`, `Defendants_count`, `Defendants_counsels_count`, `Defendants_pending_counts`, `related_case_count`
+   - Saves `data/by_case.parquet`
+
+### Smoke-test the saved parquet
 
 ```bash
 cd "/Users/mariamantsurova/Desktop/University/3rd Year/federal-court-complexity"
-
-# Skip data rebuild steps (parquets already exist), run both models for cv + cr
-.venv/bin/python3 scripts/run_pipeline.py --skip-clean --skip-case --skip-agg
+.venv/bin/python3 -c "
+import pandas as pd
+df = pd.read_parquet('data/by_case.parquet')
+print(df.shape, df.dtypes.to_dict())
+print(df['ed'].describe().round(4))
+"
 ```
-
-### Individual model scripts
-
-```bash
-# Random Forest — civil cases
-.venv/bin/python3 scripts/run_rf_shap.py --case-type cv
-
-# Random Forest — criminal cases
-.venv/bin/python3 scripts/run_rf_shap.py --case-type cr
-
-# XGBoost — civil cases
-.venv/bin/python3 scripts/run_xgb_shap.py --case-type cv
-
-# XGBoost — criminal cases
-.venv/bin/python3 scripts/run_xgb_shap.py --case-type cr
-```
-
-Each script runs **both Model A and Model B** and reports `workload_mae_improvement`.
-
-Outputs:
-- `docs/01_rf_results_{cv|cr}.json` — MAE, R², top SHAP features, model A vs B comparison
-- `docs/02_xgb_results_{cv|cr}.json` — same for XGBoost
-- `reports/figures/01_rf_shap_model_*.png` — SHAP bar plots
-- `reports/figures/02_xgb_shap_*.png` — SHAP bar + beeswarm plots
-
-### Baseline
-
-```bash
-.venv/bin/python3 scripts/run_baseline.py --case-type cv
-.venv/bin/python3 scripts/run_baseline.py --case-type cr
-```
-
-Output: `docs/00_baseline_results_{cv|cr}.json`
 
 ---
 
-## Smoke-test preprocessing
+## Judge workload features
+
+`src/judge_workload.py → add_judge_workload(df)` adds three features:
+
+| Feature                | Description                                                                  |
+| ---------------------- | ---------------------------------------------------------------------------- |
+| `judge_open_at_filing` | Cases same judge had open on focal case's filing date (excluding focal case) |
+| `judge_opened_30d`     | Cases same judge opened in the 30 days before filing                         |
+| `judge_closed_30d`     | Cases same judge closed in the 30 days before filing                         |
+
+Requires columns: `District_Judge`, `case_open_date`, `case_close_date`.
 
 ```bash
 .venv/bin/python3 -c "
 import sys; sys.path.insert(0, '.')
 import pandas as pd
-from src.features import add_derived_columns
-from src.preprocessing_trees import prepare_for_trees
+from src.judge_workload import add_judge_workload
 
-df = pd.read_parquet('data/aggregations/by_case.parquet')
-df = add_derived_columns(df)
-cv = df[df['case_type'] == 'cv']
-
-X_a, y = prepare_for_trees(cv, include_workload=False)
-print('Model A:', X_a.shape, '  target median:', round(y.median(), 3))
+df = pd.read_parquet('data/by_case.parquet')
+df = add_judge_workload(df)
+print(df[['judge_open_at_filing', 'judge_opened_30d', 'judge_closed_30d']].describe())
 "
 ```
 
-Expected: `Model A: (151640, 233)  target median: ~-0.06`
+Note: vectorised interval-overlap grouped by judge — ~30–60s on 168k cases.
 
 ---
 
-## Preprocessing summary
+## Available models (from requirements.txt)
 
-### Target
+Since `ed` is a **continuous regression target** (0–1), all of the following are applicable:
 
-`complexity_index` — mean z-score of `n_events`, `n_activity_types`, `n_motions`, `activity_entropy`.  
-Computed in `src/features.py → add_derived_columns()`. Already present in `data/aggregations/by_case.parquet`.
+| Model                       | Library   | Notes                                                                |
+| --------------------------- | --------- | -------------------------------------------------------------------- |
+| **Random Forest Regressor** | `sklearn` | Good baseline; handles mixed types; gives feature importance         |
+| **XGBoost Regressor**       | `xgboost` | Typically strongest; use with SHAP for explainability                |
+| **Ridge / Lasso**           | `sklearn` | Linear baseline; fast to fit                                         |
+| **Neural Network**          | `torch`   | Embedding layer for `District_Judge_idx` → rich judge representation |
+| **Gradient Boosting**       | `sklearn` | Alternative to XGBoost                                               |
 
-**These metrics are NEVER input features** — they are retrospective (measured after case closes). Using them as features would be endogenous to the target.
+**Not applicable here:**
 
-### Feature groups (Model A)
+- `lifelines` (survival analysis) — `ed` is not a time-to-event outcome
+- `sentence-transformers` — judge names are already integer-encoded; no raw text features remain
+- `statsmodels` — useful for significance testing of model A vs B difference, not for fitting
 
-| Group | Features |
-|---|---|
-| Plaintiff attributes | `plaintiffs_count`, `plaintiffs_share_ind/pro_se/pro_hac_vice`, `plaintiffs_counsels_count` |
-| Defendant attributes | `Defendants_count`, `Defendants_share_ind/pro_se/pro_hac_vice`, `Defendants_counsels_count`, `Defendants_pending_counts`, `Defendants_terminated_counts` |
-| Case structure | `Other_courts`, `related_case_count`, `Magistrate_Judge` (boolean) |
-| Party types | `Party_Amicus/Counter_Claimant/Counter_Defendant/Court_Monitor/Intervenor/Material_Witness/Third_Party_Defendant/Third_Party_Plaintiff/Trustee` |
-| Suit structure | `n_unique_suits`, `suit_entropy`, `is_multisuit`, `suit_dominance`, `has_<suit>`, `suit_freq_<suit>` (from `nature_suits`) |
-| Case flags | `is_cv` (binary), `is_mdl_flag` (binary) |
-| City | One-hot encoded |
+### Recommended order
+
+1. Ridge regression — linear baseline, establish floor
+2. XGBoost — primary model, use SHAP for feature attribution
+3. Neural network with `District_Judge_idx` embedding — if judge identity proves important in XGBoost SHAP
+
+---
+
+## Feature groups
+
+### Model A (filing attributes)
+
+| Group          | Columns                                                                                                                                          |
+| -------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Plaintiff      | `plaintiffs_count` (log1p), `plaintiffs_share_ind/pro_se/pro_hac_vice`, `plaintiffs_counsels_count` (log1p)                                      |
+| Defendant      | `Defendants_count` (log1p), `Defendants_share_ind/pro_se/pro_hac_vice`, `Defendants_counsels_count` (log1p), `Defendants_pending_counts` (log1p) |
+| Case structure | `related_case_count` (log1p), `Other_courts`, `Magistrate_Judge` (bool), `is_mdl`                                                                |
+| Case type      | `case_type` (cv/cr)                                                                                                                              |
+| Judge identity | `District_Judge_idx` (label-encoded integer)                                                                                                     |
+| City           | `city_*` (one-hot)                                                                                                                               |
 
 ### Model B adds
 
-| Feature | Source |
-|---|---|
-| `judge_workload_at_open` | `src/judge_workload.py` — number of concurrent open cases for the same judge on `case_open_date` |
+| Feature                | Source                  |
+| ---------------------- | ----------------------- |
+| `judge_open_at_filing` | `src/judge_workload.py` |
+| `judge_opened_30d`     | `src/judge_workload.py` |
+| `judge_closed_30d`     | `src/judge_workload.py` |
 
-### Explicitly excluded from X
+### Excluded (retrospective / identifiers)
 
-`n_events`, `n_activity_types`, `n_motions`, `activity_entropy`, `complexity_index` (→ these are the target),  
-`sum_attribute_*` (retrospective event counts),  
-`los_days`, `log_los_days` (outcome, not input),  
-`ucid`, `case_open_date`, `District_Judge` (identifiers)
-
----
-
-## Judge workload feature
-
-`src/judge_workload.py → add_judge_workload(df)` adds `judge_workload_at_open`:
-
-```bash
-.venv/bin/python3 -c "
-import sys; sys.path.insert(0, '.')
-import pandas as pd
-from src.features import add_derived_columns
-from src.judge_workload import add_judge_workload
-
-df = pd.read_parquet('data/aggregations/by_case.parquet')
-df = add_derived_columns(df)
-df = add_judge_workload(df)
-print(df['judge_workload_at_open'].describe())
-"
-```
-
-Note: runs a vectorised interval-overlap computation grouped by judge. With 168k cases it takes ~30–60s.
+`n_events`, `n_activity_types` (→ used to compute `ed`, the target),  
+`ucid`, `case_open_date`, `case_close_date` (identifiers / time leakage)
 
 ---
 
 ## Data files
 
-| File | Needed? | Notes |
-|---|---|---|
-| `data/case_features.parquet` | Yes | Input for `build_aggregations.py` |
-| `data/aggregations/by_case.parquet` | Yes | Main model input (has `complexity_index`) |
-| `data/aggregations/by_judge.parquet` | No | Not used by any current script |
-| `Event Log.csv` | Only for Step 1 | ~2.7 GB, not in repo |
-| `Event Log_model.csv` | Only for Step 2 | Built by `build_features.py` |
+| File                              | Status              | Notes                                  |
+| --------------------------------- | ------------------- | -------------------------------------- |
+| `Event Log.csv`                   | Present, not in git | ~2.7 GB raw event log                  |
+| `data/by_case.parquet`            | Present             | Main model input — built by notebook   |
+| `data/district_judge_lookup.json` | Present             | `District_Judge_idx` → judge ID string |
 
 ---
 
 ## Gotchas
 
 - **`.venv/bin/python3` is required.** System Python lacks xgboost and shap.
-- **`data/aggregations/by_case.parquet` has `complexity_index`; `data/case_features.parquet` does not.** Always call `add_derived_columns()` after loading, or use `by_case.parquet` which already has it.
-- **`add_judge_workload()` must be called before `temporal_split()`** in model scripts — the workload is computed from the full dataset (needs all cases to count overlapping open cases).
-- **Models are always run per case type** (`--case-type cv` or `--case-type cr`). Running pooled (no flag) is supported but not the primary analysis.
+- **Multi-judge rows are dropped** in the chunked load (rows where `District_Judge` contains `", "`). This is intentional.
+- **`District_Judge_idx` is label-encoded**, not ordinal — tree models and neural nets can use it; linear models should not use it as a numeric feature.
+- **`add_judge_workload()` needs `District_Judge` (string), not `District_Judge_idx`** — call it before encoding, or on the unencoded `data/by_case.parquet` which retains the original string column... check if it was dropped in the save step.
 - **`sys.path.insert(0, str(ROOT))` is required** when calling `src/` modules from `-c` snippets.
 
 ---
 
 ## Troubleshooting
 
-| Error | Fix |
-|---|---|
-| `ModuleNotFoundError: No module named 'xgboost'` | Use `.venv/bin/python3`, not system python3 |
-| `KeyError: 'complexity_index'` | Call `add_derived_columns(df)` before `prepare_for_trees()` |
-| `FileNotFoundError: data/aggregations/by_case.parquet` | Run `src/build_aggregations.py` first |
-| `FileNotFoundError: Event Log.csv` | Raw log not in repo — needed only for Step 1 rebuild |
-| `ModuleNotFoundError: No module named 'src.suit_features'` | Run from project root or add `sys.path.insert(0, str(ROOT))` |
+| Error                                            | Fix                                                                                                      |
+| ------------------------------------------------ | -------------------------------------------------------------------------------------------------------- |
+| `ModuleNotFoundError: No module named 'xgboost'` | Use `.venv/bin/python3`, not system python3                                                              |
+| `FileNotFoundError: Event Log.csv`               | Raw log must be at project root (~2.7 GB)                                                                |
+| `KeyError: 'District_Judge'`                     | Column was dropped after encoding — use `District_Judge_idx` or reload from parquet before workload step |
+| Kernel frozen at `cases.isnull().sum()`          | Restart kernel and re-run from cell 8 (chunked load) — `df` or `cases` may have been lost                |

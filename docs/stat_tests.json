@@ -1,0 +1,62 @@
+{
+  "cv": {
+    "case_type": "cv",
+    "n_test": 30328,
+    "stat_tests": {
+      "B_vs_A": {
+        "statistic": 208330030.0,
+        "p_value": 0.0,
+        "significant_at_05": true,
+        "significant_at_01": true,
+        "winner": "B",
+        "mean_mae_delta": 0.003018
+      },
+      "C_vs_B": {
+        "statistic": 207274665.5,
+        "p_value": 0.0,
+        "significant_at_05": true,
+        "significant_at_01": true,
+        "winner": "B",
+        "mean_mae_delta": -0.003613
+      },
+      "C_vs_A": {
+        "statistic": 229454199.0,
+        "p_value": 0.742824,
+        "significant_at_05": false,
+        "significant_at_01": false,
+        "winner": "A",
+        "mean_mae_delta": -0.000595
+      }
+    }
+  },
+  "cr": {
+    "case_type": "cr",
+    "n_test": 3290,
+    "stat_tests": {
+      "B_vs_A": {
+        "statistic": 2619489.5,
+        "p_value": 0.108854,
+        "significant_at_05": false,
+        "significant_at_01": false,
+        "winner": "B",
+        "mean_mae_delta": 0.003733
+      },
+      "C_vs_B": {
+        "statistic": 2335224.0,
+        "p_value": 0.0,
+        "significant_at_05": true,
+        "significant_at_01": true,
+        "winner": "B",
+        "mean_mae_delta": -0.006482
+      },
+      "C_vs_A": {
+        "statistic": 2561371.5,
+        "p_value": 0.007588,
+        "significant_at_05": true,
+        "significant_at_01": true,
+        "winner": "A",
+        "mean_mae_delta": -0.002749
+      }
+    }
+  }
+}
