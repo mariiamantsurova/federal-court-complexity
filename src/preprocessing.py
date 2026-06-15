@@ -27,13 +27,19 @@ LOOKUP_PATH  = ROOT / "data" / "district_judge_lookup.json"
 
 WORKLOAD_COLS = ["judge_open_at_filing", "judge_opened_30d", "judge_closed_30d"]
 
-_ALWAYS_EXCLUDE = {
-    "ed",               # target
+
+# aggregated target, which would be a separate pipeline (see git history).
+TARGET = "ed"
+
+_NON_FEATURE = {
     "case_type",        # subsetting only
     "ucid",             # case identifier
     "case_open_date",   # temporal split + workload input
     "case_close_date",  # workload input
     "District_Judge",   # intermediate string; reverse-mapped for workload only
+    "n_events",         # target building block — leakage
+    "n_activity_types", # target building block — leakage
+    "year"         # derived from case_open_date
 }
 
 
@@ -53,6 +59,8 @@ def load_dataset(parquet_path=None, lookup_path=None) -> pd.DataFrame:
 
     print("Computing judge workload features (all cases)...")
     df = add_judge_workload(df)
+    df['case_open_date'] = 
+    df
     print(f"  Done. Workload columns: {WORKLOAD_COLS}")
 
     return df
@@ -68,8 +76,9 @@ def temporal_split(df: pd.DataFrame, test_ratio: float = 0.2):
 
 
 def get_feature_sets(df: pd.DataFrame) -> dict[str, list[str]]:
-    """Return column lists for Model A, B, and C."""
-    all_excluded = _ALWAYS_EXCLUDE | set(WORKLOAD_COLS) | {"District_Judge_idx"}
+    """Return column lists for Model A, B, and C (target excluded from X)."""
+    all_excluded = (_NON_FEATURE | {TARGET}
+                    | set(WORKLOAD_COLS) | {"District_Judge_idx"})
     base_cols = sorted(c for c in df.columns if c not in all_excluded)
     return {
         "A": base_cols,
@@ -82,11 +91,18 @@ def prepare(
     df: pd.DataFrame,
     case_type: str,
     model_level: str,
+    target: str = TARGET,
     test_ratio: float = 0.2,
 ) -> tuple[pd.DataFrame, pd.DataFrame, pd.Series, pd.Series]:
     """Return (X_train, X_test, y_train, y_test) for a case_type × model level."""
+    if target not in df.columns:
+        raise KeyError(
+            f"target '{target}' not in dataset. "
+            "Re-run the notebook's Build & Save cell to regenerate by_case.parquet."
+        )
+
     sub = df[df["case_type"] == case_type].copy()
     train, test = temporal_split(sub, test_ratio)
 
     cols = get_feature_sets(df)[model_level]
-    return train[cols], test[cols], train["ed"], test["ed"]
+    return train[cols], test[cols], train[target], test[target]

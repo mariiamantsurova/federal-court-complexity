@@ -3,11 +3,11 @@
 Hyperparameter tuning for XGBoost via randomised search with TimeSeriesSplit.
 
 Tunes on Model C (all features) of the cv case type (largest split).
-Best params are saved to docs/xgb_best_params.json and reused by run_xgb.py.
+Best params are saved to docs/xgb_best_params_{target}.json and reused by run_xgb.py.
 
 Usage:
-  .venv/bin/python3 scripts/tune_xgb.py
-  .venv/bin/python3 scripts/tune_xgb.py --n-iter 20   # more combos
+
+  .venv/bin/python3 scripts/tune_xgb.py --n-iter 20
 """
 from __future__ import annotations
 
@@ -25,7 +25,7 @@ from sklearn.model_selection import TimeSeriesSplit
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from src.preprocessing import load_dataset, prepare
+from src.preprocessing import load_dataset, prepare, TARGET
 
 DOCS = ROOT / "docs"
 
@@ -70,9 +70,9 @@ def main():
 
     df = load_dataset()
     # Tune on Model C (richest feature set) — best params generalise to A and B
-    X_train, X_test, y_train, y_test = prepare(df, args.case_type, "C")
+    X_train, X_test, y_train, y_test = prepare(df, args.case_type, "C", target=TARGET)
 
-    print(f"Tuning XGBoost on {args.case_type.upper()} Model C "
+    print(f"Tuning XGBoost on {args.case_type.upper()} Model C | target={TARGET} "
           f"({len(X_train):,} train rows, {X_train.shape[1]} features)")
     print(f"Running {args.n_iter} random combinations with 3-fold TimeSeriesSplit ...\n")
 
@@ -106,6 +106,7 @@ def main():
 
     output = {
         "tuned_on":  args.case_type,
+        "target":    TARGET,
         "best_cv_mae":   round(best_mae, 6),
         "best_test_mae": round(test_mae, 6),
         "best_params":   best_params,
@@ -115,7 +116,7 @@ def main():
     }
 
     DOCS.mkdir(parents=True, exist_ok=True)
-    out_path = DOCS / "xgb_best_params.json"
+    out_path = DOCS / f"xgb_best_params_{TARGET}.json"
     out_path.write_text(json.dumps(output, indent=2))
     print(f"\nSaved → {out_path}")
 

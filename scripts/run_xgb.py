@@ -20,7 +20,6 @@ Outputs (docs/):
 Outputs (reports/figures/):
   xgb_mae_comparison.png          — A/B/C MAE grouped bar chart (cv + cr)
   xgb_shap_beeswarm_{ct}.png      — SHAP beeswarm, Model C
-  xgb_shap_bar_{ct}_model{X}.png  — SHAP mean |value| bar, all models
   xgb_scatter_{ct}.png            — Actual vs Predicted, Model C
 """
 from __future__ import annotations
@@ -41,11 +40,12 @@ from sklearn.metrics import mean_absolute_error, r2_score
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from src.preprocessing import load_dataset, prepare, get_feature_sets
+from src.preprocessing import (
+    load_dataset, prepare, get_feature_sets, TARGET,
+)
 
 DOCS        = ROOT / "docs"
 FIGURES     = ROOT / "reports" / "figures"
-PARAMS_PATH = DOCS / "xgb_best_params.json"
 
 DEFAULT_PARAMS = dict(
     n_estimators=500,
@@ -62,30 +62,20 @@ DEFAULT_PARAMS = dict(
 )
 
 
-def _load_params() -> dict:
-    if PARAMS_PATH.exists():
-        data = json.loads(PARAMS_PATH.read_text())
+def _load_params(target: str) -> dict:
+    params_path = DOCS / f"xgb_best_params_{target}.json"
+    if params_path.exists():
+        data = json.loads(params_path.read_text())
         tuned = {**data["fixed_params"], **data["best_params"],
                  "random_state": 42, "n_jobs": -1, "tree_method": "hist"}
-        print(f"Using tuned params from {PARAMS_PATH.name}  (cv_mae={data['best_cv_mae']:.5f})")
+        print(f"Using tuned params from {params_path.name}  (cv_mae={data['best_cv_mae']:.5f})")
         return tuned
-    print("No tuned params found — using defaults. Run scripts/tune_xgb.py first.")
+    print(f"No tuned params for target='{target}' — using defaults. "
+          f"Run scripts/tune_xgb.py --target {target} first.")
     return DEFAULT_PARAMS
 
 
 # ── Plotting helpers ──────────────────────────────────────────────────────────
-
-def _plot_shap_bar(top15: list[dict], title: str, path: Path, color: str = "#2980b9"):
-    features = [r["feature"] for r in top15][::-1]
-    values   = [r["mean_abs_shap"] for r in top15][::-1]
-    fig, ax  = plt.subplots(figsize=(9, 5))
-    ax.barh(features, values, color=color)
-    ax.set_xlabel("Mean |SHAP value|")
-    ax.set_title(title)
-    plt.tight_layout()
-    fig.savefig(path, dpi=150)
-    plt.close(fig)
-
 
 def _plot_beeswarm(sv, title: str, path: Path):
     fig, ax = plt.subplots(figsize=(10, 6))
@@ -166,15 +156,15 @@ def _plot_r2_waterfall(result: dict, path: Path):
 
 # ── Main logic ────────────────────────────────────────────────────────────────
 
-def run_case_type(df, case_type: str, params: dict) -> dict:
-    print(f"\n── XGBoost | {case_type.upper()} ──")
+def run_case_type(df, case_type: str, params: dict, target: str) -> dict:
+    print(f"\n── XGBoost | {case_type.upper()} | target={target} ──")
     models_out   = {}
     feature_sets = get_feature_sets(df)
     preds        = {}
     y_test_vals  = None
 
     for level in ["A", "B", "C"]:
-        X_train, X_test, y_train, y_test = prepare(df, case_type, level)
+        X_train, X_test, y_train, y_test = prepare(df, case_type, level, target=target)
 
         model = xgb.XGBRegressor(**params)
         model.fit(X_train, y_train, eval_set=[(X_test, y_test)], verbose=False)
@@ -197,14 +187,9 @@ def run_case_type(df, case_type: str, params: dict) -> dict:
         )[:15]
 
         FIGURES.mkdir(parents=True, exist_ok=True)
-        _plot_shap_bar(
-            [{"feature": f, "mean_abs_shap": v} for f, v in top15],
-            title=f"XGBoost Model {level} | {case_type.upper()}",
-            path=FIGURES / f"xgb_shap_bar_{case_type}_model{level}.png",
-        )
         if level == "C":
-            _plot_beeswarm(sv, f"SHAP Beeswarm — Model C | {case_type.upper()}",
-                           FIGURES / f"xgb_shap_beeswarm_{case_type}.png")
+            _plot_beeswarm(sv, f"SHAP Beeswarm — Model C | {case_type.upper()} | {target}",
+                           FIGURES / f"xgb_shap_beeswarm_{target}_{case_type}.png")
 
         models_out[level] = {
             "mae":        round(mae, 6),
@@ -220,15 +205,16 @@ def run_case_type(df, case_type: str, params: dict) -> dict:
 
     # Persist predictions for downstream analysis
     DOCS.mkdir(parents=True, exist_ok=True)
-    np.savez(DOCS / f"xgb_predictions_{case_type}.npz",
+    np.savez(DOCS / f"xgb_predictions_{target}_{case_type}.npz",
              y_test=y_test_vals, **{f"pred_{lv}": preds[lv] for lv in preds}) # type: ignore
 
     _plot_scatter(y_test_vals, preds["C"], case_type,
-                  FIGURES / f"xgb_scatter_{case_type}.png")
+                  FIGURES / f"xgb_scatter_{target}_{case_type}.png")
 
     m = models_out
     result = {
         "case_type": case_type,
+        "target":    target,
         "models":    m,
         "B_vs_A_mae_improvement": round(m["A"]["mae"] - m["B"]["mae"], 6),
         "C_vs_B_mae_improvement": round(m["B"]["mae"] - m["C"]["mae"], 6),
@@ -239,7 +225,7 @@ def run_case_type(df, case_type: str, params: dict) -> dict:
           f"ΔC-A={result['C_vs_A_mae_improvement']:+.4f}")
 
     # R² waterfall
-    _plot_r2_waterfall(result, FIGURES / f"xgb_r2_waterfall_{case_type}.png")
+    _plot_r2_waterfall(result, FIGURES / f"xgb_r2_waterfall_{target}_{case_type}.png")
 
     return result
 
@@ -249,22 +235,22 @@ def main():
     parser.add_argument("--case-type", choices=["cv", "cr", "both"], default="both")
     args = parser.parse_args()
 
-    params = _load_params()
+    params = _load_params(TARGET)
     df     = load_dataset()
     types  = ["cv", "cr"] if args.case_type == "both" else [args.case_type]
 
     all_results = {}
     for ct in types:
-        all_results[ct] = run_case_type(df, ct, params)
+        all_results[ct] = run_case_type(df, ct, params, TARGET)
 
     # Cross-case-type MAE comparison chart (only when both are run)
     if len(all_results) > 1:
         FIGURES.mkdir(parents=True, exist_ok=True)
-        _plot_mae_comparison(all_results, FIGURES / "xgb_mae_comparison.png")
-        print(f"\nSaved → {FIGURES / 'xgb_mae_comparison.png'}")
+        _plot_mae_comparison(all_results, FIGURES / f"xgb_mae_comparison_{TARGET}.png")
+        print(f"\nSaved → {FIGURES / f'xgb_mae_comparison_{TARGET}.png'}")
 
     DOCS.mkdir(parents=True, exist_ok=True)
-    out = DOCS / "xgb_results.json"
+    out = DOCS / f"xgb_results_{TARGET}.json"
     out.write_text(json.dumps(all_results, indent=2))
     print(f"Saved → {out}")
 

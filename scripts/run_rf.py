@@ -29,7 +29,9 @@ from sklearn.pipeline import Pipeline
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from src.preprocessing import load_dataset, prepare, get_feature_sets
+from src.preprocessing import (
+    load_dataset, prepare, get_feature_sets, TARGET,
+)
 
 DOCS    = ROOT / "docs"
 FIGURES = ROOT / "reports" / "figures"
@@ -43,31 +45,75 @@ RF_PARAMS = dict(
 )
 
 
-def _shap_bar(features, values, title, path):
-    fig, ax = plt.subplots(figsize=(9, 5))
-    ax.barh(features[::-1], values[::-1], color="#27ae60")
-    ax.set_xlabel("Mean |SHAP value|")
-    ax.set_title(title)
+def _plot_mae_comparison(all_results: dict, path: Path):
+    """Grouped bar chart of MAE for A/B/C across case types."""
+    case_types = list(all_results.keys())
+    levels     = ["A", "B", "C"]
+    x          = np.arange(len(levels))
+    width      = 0.35
+    colors     = ["#2980b9", "#e67e22"]
+
+    fig, ax = plt.subplots(figsize=(8, 5))
+    for i, (ct, color) in enumerate(zip(case_types, colors)):
+        maes = [all_results[ct]["models"][lv]["mae"] for lv in levels]
+        bars = ax.bar(x + i * width, maes, width, label=ct.upper(), color=color, alpha=0.85)
+        for bar, v in zip(bars, maes):
+            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.0005,
+                    f"{v:.4f}", ha="center", va="bottom", fontsize=8)
+
+    ax.set_xticks(x + width / 2)
+    ax.set_xticklabels(["Model A\n(filing only)", "Model B\n(+ judge ID)", "Model C\n(+ workload)"])
+    ax.set_ylabel("MAE (lower is better)")
+    ax.set_title("Random Forest: MAE by Model Level and Case Type")
+    ax.legend()
     plt.tight_layout()
     fig.savefig(path, dpi=150)
     plt.close(fig)
 
 
-def run_case_type(df, case_type: str) -> dict:
-    print(f"\n── Random Forest | {case_type.upper()} ──")
+def _plot_r2_waterfall(result: dict, path: Path):
+    """R² improvement waterfall A → B → C for one case type."""
+    ct     = result["case_type"]
+    levels = ["A", "B", "C"]
+    r2s    = [result["models"][lv]["r2"] for lv in levels]
+    labels = ["Model A\n(filing only)", "Model B\n(+ judge ID)", "Model C\n(+ workload)"]
+    colors = ["#2980b9", "#27ae60" if r2s[1] >= r2s[0] else "#e74c3c",
+              "#27ae60" if r2s[2] >= r2s[1] else "#e74c3c"]
+
+    fig, ax = plt.subplots(figsize=(7, 4))
+    bars = ax.bar(labels, r2s, color=colors, alpha=0.85, width=0.5)
+    for bar, v in zip(bars, r2s):
+        ax.text(bar.get_x() + bar.get_width() / 2, v + 0.003,
+                f"R²={v:.4f}", ha="center", va="bottom", fontsize=9)
+    for i in range(1, len(r2s)):
+        delta = r2s[i] - r2s[i - 1]
+        sign  = "+" if delta >= 0 else ""
+        ax.annotate(f"{sign}{delta:.4f}", xy=(i, r2s[i]), xytext=(i - 0.5, max(r2s) * 1.02),
+                    fontsize=8, color="grey", ha="center")
+
+    ax.set_ylabel("R²")
+    ax.set_title(f"Random Forest: R² by Model Level | {ct.upper()}")
+    ax.set_ylim(min(0, min(r2s)), min(1.0, max(r2s) * 1.12) if max(r2s) > 0 else 0.05)
+    plt.tight_layout()
+    fig.savefig(path, dpi=150)
+    plt.close(fig)
+
+
+def run_case_type(df, case_type: str, target: str) -> dict:
+    print(f"\n── Random Forest | {case_type.upper()} | target={target} ──")
     models_out = {}
 
     feature_sets = get_feature_sets(df)
 
     for level in ["A", "B", "C"]:
-        X_train, X_test, y_train, y_test = prepare(df, case_type, level)
+        X_train, X_test, y_train, y_test = prepare(df, case_type, level, target=target)
 
         # RF does not handle NaN natively — impute with column median
         imputer = SimpleImputer(strategy="median")
         X_train_imp = imputer.fit_transform(X_train)
         X_test_imp  = imputer.transform(X_test)
 
-        model = RandomForestRegressor(**RF_PARAMS)
+        model = RandomForestRegressor(**RF_PARAMS) # type: ignore
         model.fit(X_train_imp, y_train)
 
         y_pred = model.predict(X_test_imp)
@@ -86,13 +132,6 @@ def run_case_type(df, case_type: str) -> dict:
             key=lambda x: x[1], reverse=True
         )[:15]
 
-        FIGURES.mkdir(parents=True, exist_ok=True)
-        _shap_bar(
-            [f for f, _ in top15], [v for _, v in top15],
-            title=f"Random Forest Model {level} | {case_type.upper()} — Top 15 features",
-            path=FIGURES / f"rf_shap_{case_type}_model{level}.png",
-        )
-
         models_out[level] = {
             "mae":      round(mae, 6),
             "r2":       round(r2, 6),
@@ -109,6 +148,7 @@ def run_case_type(df, case_type: str) -> dict:
     m = models_out
     result = {
         "case_type": case_type,
+        "target":    target,
         "models":    m,
         "B_vs_A_mae_improvement": round(m["A"]["mae"] - m["B"]["mae"], 6),
         "C_vs_B_mae_improvement": round(m["B"]["mae"] - m["C"]["mae"], 6),
@@ -117,6 +157,10 @@ def run_case_type(df, case_type: str) -> dict:
     print(f"  ΔB-A={result['B_vs_A_mae_improvement']:+.4f}  "
           f"ΔC-B={result['C_vs_B_mae_improvement']:+.4f}  "
           f"ΔC-A={result['C_vs_A_mae_improvement']:+.4f}")
+
+    FIGURES.mkdir(parents=True, exist_ok=True)
+    _plot_r2_waterfall(result, FIGURES / f"rf_r2_waterfall_{target}_{case_type}.png")
+
     return result
 
 
@@ -130,10 +174,16 @@ def main():
 
     all_results = {}
     for ct in types:
-        all_results[ct] = run_case_type(df, ct)
+        all_results[ct] = run_case_type(df, ct, TARGET)
+
+    # Cross-case-type MAE comparison chart (only when both are run)
+    if len(all_results) > 1:
+        FIGURES.mkdir(parents=True, exist_ok=True)
+        _plot_mae_comparison(all_results, FIGURES / f"rf_mae_comparison_{TARGET}.png")
+        print(f"\nSaved → {FIGURES / f'rf_mae_comparison_{TARGET}.png'}")
 
     DOCS.mkdir(parents=True, exist_ok=True)
-    out = DOCS / "rf_results.json"
+    out = DOCS / f"rf_results_{TARGET}.json"
     out.write_text(json.dumps(all_results, indent=2))
     print(f"\nSaved → {out}")
 
