@@ -3,7 +3,7 @@
 Random Forest — Model A / B / C comparison for cv and cr case types.
 
 Model A: filing attributes only
-Model B: + District_Judge_idx  (judge identity)
+Model B: + District_Judge  (judge identity)
 Model C: + judge_open_at_filing, judge_opened_30d, judge_closed_30d  (workload)
 
 Usage:
@@ -43,6 +43,18 @@ RF_PARAMS = dict(
     random_state=42,
     n_jobs=-1,
 )
+
+# sklearn's RandomForest has no native categorical support, so District_Judge
+# (a string id) is label-encoded to integer codes — the same ordinal treatment
+# it had as District_Judge_idx. Encode on the full frame so train/test share codes.
+CATEGORICAL_COLS = ["District_Judge"]
+
+
+def _encode_categorical(df):
+    for col in CATEGORICAL_COLS:
+        if col in df.columns:
+            df[col] = df[col].astype("category").cat.codes
+    return df
 
 
 def _plot_mae_comparison(all_results: dict, path: Path):
@@ -169,7 +181,7 @@ def main():
     parser.add_argument("--case-type", choices=["cv", "cr", "both"], default="both")
     args = parser.parse_args()
 
-    df = load_dataset()
+    df = _encode_categorical(load_dataset())
     types = ["cv", "cr"] if args.case_type == "both" else [args.case_type]
 
     all_results = {}

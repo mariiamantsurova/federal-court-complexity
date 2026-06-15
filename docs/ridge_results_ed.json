@@ -93,9 +93,9 @@
         ]
       },
       "B": {
-        "mae": 0.152536,
-        "r2": 0.457476,
-        "alpha": 30.702906,
+        "mae": 0.148275,
+        "r2": 0.473597,
+        "alpha": 5.878016,
         "n_train": 121309,
         "n_test": 30328,
         "features": [
@@ -117,75 +117,75 @@
           "plaintiffs_share_pro_hac_vice",
           "plaintiffs_share_pro_se",
           "related_case_count",
-          "District_Judge_idx"
+          "District_Judge"
         ],
         "coef_top15": [
           {
+            "feature": "District_Judge_SJ000193",
+            "coef": 0.262436
+          },
+          {
+            "feature": "District_Judge_SJ000233",
+            "coef": 0.208627
+          },
+          {
+            "feature": "District_Judge_SJ000206",
+            "coef": 0.157742
+          },
+          {
             "feature": "Defendants_counsels_count",
-            "coef": -0.132068
+            "coef": -0.129925
           },
           {
-            "feature": "plaintiffs_counsels_count",
-            "coef": -0.046162
+            "feature": "District_Judge_SJ002134",
+            "coef": -0.120343
           },
           {
-            "feature": "is_mdl",
-            "coef": 0.043556
+            "feature": "District_Judge_Unknown",
+            "coef": 0.101527
           },
           {
-            "feature": "Magistrate_Judge",
-            "coef": -0.034107
+            "feature": "District_Judge_SJ000216",
+            "coef": -0.099696
           },
           {
-            "feature": "plaintiffs_count",
-            "coef": 0.020498
+            "feature": "District_Judge_SJ001316",
+            "coef": -0.094981
           },
           {
-            "feature": "Other_courts",
-            "coef": -0.019421
+            "feature": "District_Judge_SJ000219",
+            "coef": -0.090186
           },
           {
-            "feature": "Defendants_share_pro_se",
-            "coef": -0.01656
+            "feature": "District_Judge_SJ000194",
+            "coef": -0.080616
           },
           {
-            "feature": "plaintiffs_share_pro_se",
-            "coef": -0.00972
+            "feature": "District_Judge_SJ000218",
+            "coef": -0.079365
           },
           {
-            "feature": "Defendants_share_ind",
-            "coef": 0.009339
+            "feature": "District_Judge_SJ000211",
+            "coef": -0.071635
           },
           {
-            "feature": "city_Chicago",
-            "coef": -0.006565
+            "feature": "District_Judge_SJ000179",
+            "coef": -0.071269
           },
           {
-            "feature": "city_Rockford",
-            "coef": 0.006565
+            "feature": "District_Judge_SJ000245",
+            "coef": -0.06857
           },
           {
-            "feature": "Defendants_count",
-            "coef": 0.00551
-          },
-          {
-            "feature": "District_Judge_idx",
-            "coef": 0.003426
-          },
-          {
-            "feature": "plaintiffs_share_ind",
-            "coef": 0.003316
-          },
-          {
-            "feature": "Defendants_share_pro_hac_vice",
-            "coef": -0.00215
+            "feature": "District_Judge_SJ000187",
+            "coef": -0.062785
           }
         ]
       },
       "C": {
-        "mae": 0.154742,
-        "r2": 0.44593,
-        "alpha": 30.702906,
+        "mae": 0.149275,
+        "r2": 0.473121,
+        "alpha": 3.888155,
         "n_train": 121309,
         "n_test": 30328,
         "features": [
@@ -207,78 +207,78 @@
           "plaintiffs_share_pro_hac_vice",
           "plaintiffs_share_pro_se",
           "related_case_count",
-          "District_Judge_idx",
+          "District_Judge",
           "judge_open_at_filing",
           "judge_opened_30d",
           "judge_closed_30d"
         ],
         "coef_top15": [
           {
+            "feature": "District_Judge_SJ000193",
+            "coef": 0.271991
+          },
+          {
+            "feature": "District_Judge_SJ000233",
+            "coef": 0.213194
+          },
+          {
+            "feature": "District_Judge_SJ002134",
+            "coef": -0.140041
+          },
+          {
             "feature": "Defendants_counsels_count",
-            "coef": -0.129664
+            "coef": -0.128666
           },
           {
-            "feature": "plaintiffs_counsels_count",
-            "coef": -0.050152
+            "feature": "District_Judge_SJ001316",
+            "coef": -0.121445
           },
           {
-            "feature": "judge_open_at_filing",
-            "coef": -0.045431
+            "feature": "District_Judge_SJ000211",
+            "coef": -0.118065
           },
           {
-            "feature": "is_mdl",
-            "coef": 0.043721
+            "feature": "District_Judge_SJ000206",
+            "coef": 0.117673
+          },
+          {
+            "feature": "District_Judge_Unknown",
+            "coef": 0.09537
+          },
+          {
+            "feature": "District_Judge_SJ003440",
+            "coef": -0.081938
+          },
+          {
+            "feature": "District_Judge_SJ000212",
+            "coef": 0.074794
+          },
+          {
+            "feature": "District_Judge_SJ000194",
+            "coef": -0.068054
+          },
+          {
+            "feature": "District_Judge_SJ000218",
+            "coef": -0.061483
+          },
+          {
+            "feature": "District_Judge_SJ002285",
+            "coef": -0.060887
+          },
+          {
+            "feature": "District_Judge_SJ000216",
+            "coef": -0.059182
           },
           {
             "feature": "Magistrate_Judge",
-            "coef": -0.031762
-          },
-          {
-            "feature": "judge_closed_30d",
-            "coef": 0.027652
-          },
-          {
-            "feature": "judge_opened_30d",
-            "coef": 0.024325
-          },
-          {
-            "feature": "plaintiffs_count",
-            "coef": 0.022714
-          },
-          {
-            "feature": "Other_courts",
-            "coef": -0.019649
-          },
-          {
-            "feature": "Defendants_share_pro_se",
-            "coef": -0.015319
-          },
-          {
-            "feature": "plaintiffs_share_pro_se",
-            "coef": -0.01078
-          },
-          {
-            "feature": "Defendants_share_ind",
-            "coef": 0.007975
-          },
-          {
-            "feature": "city_Rockford",
-            "coef": 0.00657
-          },
-          {
-            "feature": "city_Chicago",
-            "coef": -0.00657
-          },
-          {
-            "feature": "Defendants_count",
-            "coef": 0.006137
+            "coef": -0.058143
           }
         ]
       }
     },
-    "B_vs_A_mae_improvement": -6.8e-05,
-    "C_vs_B_mae_improvement": -0.002206,
-    "C_vs_A_mae_improvement": -0.002274
+    "B_vs_A_mae_improvement": 0.004193,
+    "C_vs_B_mae_improvement": -0.001,
+    "C_vs_A_mae_improvement": 0.003193
   },
   "cr": {
     "case_type": "cr",
@@ -374,98 +374,8 @@
         ]
       },
       "B": {
-        "mae": 0.152906,
-        "r2": 0.542274,
-        "alpha": 13.433993,
-        "n_train": 13157,
-        "n_test": 3290,
-        "features": [
-          "Defendants_counsels_count",
-          "Defendants_count",
-          "Defendants_pending_counts",
-          "Defendants_share_ind",
-          "Defendants_share_pro_hac_vice",
-          "Defendants_share_pro_se",
-          "Magistrate_Judge",
-          "Other_courts",
-          "city_Chicago",
-          "city_Rockford",
-          "is_mdl",
-          "nature_suit_idx",
-          "plaintiffs_counsels_count",
-          "plaintiffs_count",
-          "plaintiffs_share_ind",
-          "plaintiffs_share_pro_hac_vice",
-          "plaintiffs_share_pro_se",
-          "related_case_count",
-          "District_Judge_idx"
-        ],
-        "coef_top15": [
-          {
-            "feature": "Defendants_counsels_count",
-            "coef": -0.129686
-          },
-          {
-            "feature": "Defendants_pending_counts",
-            "coef": -0.067054
-          },
-          {
-            "feature": "Other_courts",
-            "coef": 0.062794
-          },
-          {
-            "feature": "Defendants_count",
-            "coef": 0.058077
-          },
-          {
-            "feature": "plaintiffs_counsels_count",
-            "coef": -0.054467
-          },
-          {
-            "feature": "District_Judge_idx",
-            "coef": 0.025852
-          },
-          {
-            "feature": "plaintiffs_count",
-            "coef": 0.014935
-          },
-          {
-            "feature": "Magistrate_Judge",
-            "coef": 0.012264
-          },
-          {
-            "feature": "Defendants_share_pro_se",
-            "coef": -0.007718
-          },
-          {
-            "feature": "plaintiffs_share_ind",
-            "coef": -0.002834
-          },
-          {
-            "feature": "Defendants_share_pro_hac_vice",
-            "coef": 0.001019
-          },
-          {
-            "feature": "city_Chicago",
-            "coef": -0.000786
-          },
-          {
-            "feature": "city_Rockford",
-            "coef": 0.000786
-          },
-          {
-            "feature": "plaintiffs_share_pro_hac_vice",
-            "coef": 0.000746
-          },
-          {
-            "feature": "Defendants_share_ind",
-            "coef": 0.000652
-          }
-        ]
-      },
-      "C": {
-        "mae": 0.154823,
-        "r2": 0.535082,
+        "mae": 0.153659,
+        "r2": 0.535917,
         "alpha": 20.309176,
         "n_train": 13157,
         "n_test": 3290,
@@ -488,77 +398,167 @@
           "plaintiffs_share_pro_hac_vice",
           "plaintiffs_share_pro_se",
           "related_case_count",
-          "District_Judge_idx",
+          "District_Judge"
+        ],
+        "coef_top15": [
+          {
+            "feature": "District_Judge_Unknown",
+            "coef": 0.136379
+          },
+          {
+            "feature": "Defendants_counsels_count",
+            "coef": -0.128415
+          },
+          {
+            "feature": "District_Judge_SJ000233",
+            "coef": -0.084723
+          },
+          {
+            "feature": "Other_courts",
+            "coef": 0.065024
+          },
+          {
+            "feature": "District_Judge_SJ000193",
+            "coef": -0.059757
+          },
+          {
+            "feature": "Defendants_pending_counts",
+            "coef": -0.056679
+          },
+          {
+            "feature": "Defendants_count",
+            "coef": 0.053594
+          },
+          {
+            "feature": "plaintiffs_counsels_count",
+            "coef": -0.050302
+          },
+          {
+            "feature": "District_Judge_SJ000218",
+            "coef": -0.037741
+          },
+          {
+            "feature": "District_Judge_SJ000257",
+            "coef": 0.035192
+          },
+          {
+            "feature": "District_Judge_SJ000250",
+            "coef": 0.033777
+          },
+          {
+            "feature": "District_Judge_SJ000179",
+            "coef": -0.031194
+          },
+          {
+            "feature": "District_Judge_SJ000261",
+            "coef": -0.029997
+          },
+          {
+            "feature": "District_Judge_SJ000244",
+            "coef": 0.029326
+          },
+          {
+            "feature": "District_Judge_SJ000212",
+            "coef": -0.02745
+          }
+        ]
+      },
+      "C": {
+        "mae": 0.155226,
+        "r2": 0.530215,
+        "alpha": 20.309176,
+        "n_train": 13157,
+        "n_test": 3290,
+        "features": [
+          "Defendants_counsels_count",
+          "Defendants_count",
+          "Defendants_pending_counts",
+          "Defendants_share_ind",
+          "Defendants_share_pro_hac_vice",
+          "Defendants_share_pro_se",
+          "Magistrate_Judge",
+          "Other_courts",
+          "city_Chicago",
+          "city_Rockford",
+          "is_mdl",
+          "nature_suit_idx",
+          "plaintiffs_counsels_count",
+          "plaintiffs_count",
+          "plaintiffs_share_ind",
+          "plaintiffs_share_pro_hac_vice",
+          "plaintiffs_share_pro_se",
+          "related_case_count",
+          "District_Judge",
           "judge_open_at_filing",
           "judge_opened_30d",
           "judge_closed_30d"
         ],
         "coef_top15": [
           {
-            "feature": "Defendants_counsels_count",
-            "coef": -0.128842
+            "feature": "District_Judge_Unknown",
+            "coef": 0.128888
           },
           {
-            "feature": "Defendants_pending_counts",
-            "coef": -0.064616
+            "feature": "Defendants_counsels_count",
+            "coef": -0.127999
+          },
+          {
+            "feature": "District_Judge_SJ000233",
+            "coef": -0.090181
+          },
+          {
+            "feature": "District_Judge_SJ000193",
+            "coef": -0.064597
           },
           {
             "feature": "Other_courts",
-            "coef": 0.060562
+            "coef": 0.062921
+          },
+          {
+            "feature": "Defendants_pending_counts",
+            "coef": -0.056042
           },
           {
             "feature": "Defendants_count",
-            "coef": 0.058353
+            "coef": 0.054325
           },
           {
             "feature": "plaintiffs_counsels_count",
-            "coef": -0.057013
+            "coef": -0.05323
           },
           {
-            "feature": "judge_open_at_filing",
-            "coef": 0.023014
+            "feature": "District_Judge_SJ000257",
+            "coef": 0.039241
           },
           {
-            "feature": "District_Judge_idx",
-            "coef": 0.022999
+            "feature": "District_Judge_SJ000250",
+            "coef": 0.03912
           },
           {
-            "feature": "plaintiffs_count",
-            "coef": 0.01549
+            "feature": "District_Judge_SJ000218",
+            "coef": -0.037174
           },
           {
-            "feature": "judge_opened_30d",
-            "coef": -0.010842
+            "feature": "District_Judge_SJ000212",
+            "coef": -0.032365
           },
           {
-            "feature": "Magistrate_Judge",
-            "coef": 0.007362
+            "feature": "District_Judge_SJ000244",
+            "coef": 0.027868
           },
           {
-            "feature": "Defendants_share_pro_se",
-            "coef": -0.006392
+            "feature": "District_Judge_SJ000205",
+            "coef": 0.025502
           },
           {
-            "feature": "judge_closed_30d",
-            "coef": 0.004346
-          },
-          {
-            "feature": "plaintiffs_share_ind",
-            "coef": -0.002585
-          },
-          {
-            "feature": "Defendants_share_ind",
-            "coef": 0.001895
-          },
-          {
-            "feature": "city_Rockford",
-            "coef": 0.001192
+            "feature": "District_Judge_SJ000179",
+            "coef": -0.025209
           }
         ]
       }
     },
-    "B_vs_A_mae_improvement": -0.000998,
-    "C_vs_B_mae_improvement": -0.001917,
-    "C_vs_A_mae_improvement": -0.002915
+    "B_vs_A_mae_improvement": -0.001751,
+    "C_vs_B_mae_improvement": -0.001567,
+    "C_vs_A_mae_improvement": -0.003318
   }
 }

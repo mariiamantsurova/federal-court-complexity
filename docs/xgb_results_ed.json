@@ -4,8 +4,8 @@
     "target": "ed",
     "models": {
       "A": {
-        "mae": 0.130454,
-        "r2": 0.586702,
+        "mae": 0.131566,
+        "r2": 0.582459,
         "n_train": 121309,
         "n_test": 30328,
         "n_features": 18,
@@ -32,69 +32,69 @@
         "shap_top15": [
           {
             "feature": "Defendants_counsels_count",
-            "mean_abs_shap": 0.096999
+            "mean_abs_shap": 0.098055
           },
           {
             "feature": "nature_suit_idx",
-            "mean_abs_shap": 0.044559
+            "mean_abs_shap": 0.044611
           },
           {
             "feature": "plaintiffs_counsels_count",
-            "mean_abs_shap": 0.039575
+            "mean_abs_shap": 0.039563
           },
           {
             "feature": "is_mdl",
-            "mean_abs_shap": 0.030411
+            "mean_abs_shap": 0.03255
           },
           {
             "feature": "Magistrate_Judge",
-            "mean_abs_shap": 0.014367
+            "mean_abs_shap": 0.014377
           },
           {
             "feature": "Other_courts",
-            "mean_abs_shap": 0.013657
+            "mean_abs_shap": 0.01417
           },
           {
             "feature": "plaintiffs_share_ind",
-            "mean_abs_shap": 0.010147
-          },
-          {
-            "feature": "Defendants_count",
-            "mean_abs_shap": 0.010004
+            "mean_abs_shap": 0.010008
           },
           {
             "feature": "plaintiffs_share_pro_se",
-            "mean_abs_shap": 0.009732
+            "mean_abs_shap": 0.009751
+          },
+          {
+            "feature": "Defendants_count",
+            "mean_abs_shap": 0.008971
           },
           {
             "feature": "Defendants_share_ind",
-            "mean_abs_shap": 0.005515
+            "mean_abs_shap": 0.005311
           },
           {
             "feature": "Defendants_share_pro_se",
-            "mean_abs_shap": 0.004326
+            "mean_abs_shap": 0.004475
           },
           {
             "feature": "plaintiffs_count",
-            "mean_abs_shap": 0.00381
+            "mean_abs_shap": 0.003542
           },
           {
             "feature": "Defendants_share_pro_hac_vice",
-            "mean_abs_shap": 0.003108
+            "mean_abs_shap": 0.003243
           },
           {
             "feature": "city_Chicago",
-            "mean_abs_shap": 0.002397
+            "mean_abs_shap": 0.002562
           },
           {
             "feature": "plaintiffs_share_pro_hac_vice",
-            "mean_abs_shap": 0.001869
+            "mean_abs_shap": 0.001855
           }
         ]
       },
       "B": {
-        "mae": 0.127436,
-        "r2": 0.600472,
+        "mae": 0.128913,
+        "r2": 0.592569,
         "n_train": 121309,
         "n_test": 30328,
         "n_features": 19,
@@ -117,74 +117,74 @@
           "plaintiffs_share_pro_hac_vice",
           "plaintiffs_share_pro_se",
           "related_case_count",
-          "District_Judge_idx"
+          "District_Judge"
         ],
         "shap_top15": [
           {
             "feature": "Defendants_counsels_count",
-            "mean_abs_shap": 0.093318
-          },
-          {
-            "feature": "nature_suit_idx",
-            "mean_abs_shap": 0.042277
+            "mean_abs_shap": 0.096463
           },
           {
             "feature": "plaintiffs_counsels_count",
-            "mean_abs_shap": 0.041275
+            "mean_abs_shap": 0.042113
+          },
+          {
+            "feature": "nature_suit_idx",
+            "mean_abs_shap": 0.040639
+          },
+          {
+            "feature": "District_Judge",
+            "mean_abs_shap": 0.03969
           },
           {
             "feature": "is_mdl",
-            "mean_abs_shap": 0.032423
-          },
-          {
-            "feature": "District_Judge_idx",
-            "mean_abs_shap": 0.031743
+            "mean_abs_shap": 0.033998
           },
           {
             "feature": "Other_courts",
-            "mean_abs_shap": 0.013757
-          },
-          {
-            "feature": "Defendants_count",
-            "mean_abs_shap": 0.010079
-          },
-          {
-            "feature": "plaintiffs_share_pro_se",
-            "mean_abs_shap": 0.009668
+            "mean_abs_shap": 0.014475
           },
           {
             "feature": "plaintiffs_share_ind",
-            "mean_abs_shap": 0.009555
+            "mean_abs_shap": 0.009997
+          },
+          {
+            "feature": "plaintiffs_share_pro_se",
+            "mean_abs_shap": 0.009904
+          },
+          {
+            "feature": "Defendants_count",
+            "mean_abs_shap": 0.008438
           },
           {
             "feature": "Magistrate_Judge",
-            "mean_abs_shap": 0.006488
+            "mean_abs_shap": 0.005849
           },
           {
             "feature": "Defendants_share_ind",
-            "mean_abs_shap": 0.004791
+            "mean_abs_shap": 0.004963
           },
           {
             "feature": "Defendants_share_pro_se",
-            "mean_abs_shap": 0.004114
+            "mean_abs_shap": 0.004295
           },
           {
             "feature": "plaintiffs_count",
-            "mean_abs_shap": 0.003668
+            "mean_abs_shap": 0.003124
           },
           {
             "feature": "Defendants_share_pro_hac_vice",
-            "mean_abs_shap": 0.002896
+            "mean_abs_shap": 0.002778
           },
           {
             "feature": "city_Chicago",
-            "mean_abs_shap": 0.002722
+            "mean_abs_shap": 0.002337
           }
         ]
       },
       "C": {
-        "mae": 0.131049,
-        "r2": 0.584307,
+        "mae": 0.131604,
+        "r2": 0.583423,
         "n_train": 121309,
         "n_test": 30328,
         "n_features": 22,
@@ -207,7 +207,7 @@
           "plaintiffs_share_pro_hac_vice",
           "plaintiffs_share_pro_se",
           "related_case_count",
-          "District_Judge_idx",
+          "District_Judge",
           "judge_open_at_filing",
           "judge_opened_30d",
           "judge_closed_30d"
@@ -215,78 +215,78 @@
         "shap_top15": [
           {
             "feature": "Defendants_counsels_count",
-            "mean_abs_shap": 0.093018
+            "mean_abs_shap": 0.096009
           },
           {
             "feature": "plaintiffs_counsels_count",
-            "mean_abs_shap": 0.04009
+            "mean_abs_shap": 0.041334
           },
           {
             "feature": "nature_suit_idx",
-            "mean_abs_shap": 0.036984
+            "mean_abs_shap": 0.035957
+          },
+          {
+            "feature": "District_Judge",
+            "mean_abs_shap": 0.031559
           },
           {
             "feature": "is_mdl",
-            "mean_abs_shap": 0.026362
-          },
-          {
-            "feature": "District_Judge_idx",
-            "mean_abs_shap": 0.018064
-          },
-          {
-            "feature": "judge_open_at_filing",
-            "mean_abs_shap": 0.015233
+            "mean_abs_shap": 0.028632
           },
           {
             "feature": "Other_courts",
-            "mean_abs_shap": 0.013795
+            "mean_abs_shap": 0.014239
+          },
+          {
+            "feature": "judge_open_at_filing",
+            "mean_abs_shap": 0.012801
           },
           {
             "feature": "plaintiffs_share_pro_se",
-            "mean_abs_shap": 0.0101
+            "mean_abs_shap": 0.01069
           },
           {
             "feature": "plaintiffs_share_ind",
-            "mean_abs_shap": 0.009203
+            "mean_abs_shap": 0.009581
           },
           {
             "feature": "Defendants_count",
-            "mean_abs_shap": 0.007894
+            "mean_abs_shap": 0.007023
           },
           {
             "feature": "judge_opened_30d",
-            "mean_abs_shap": 0.00708
+            "mean_abs_shap": 0.006796
           },
           {
             "feature": "judge_closed_30d",
-            "mean_abs_shap": 0.006621
+            "mean_abs_shap": 0.006305
           },
           {
             "feature": "Magistrate_Judge",
-            "mean_abs_shap": 0.004753
+            "mean_abs_shap": 0.005746
           },
           {
             "feature": "Defendants_share_ind",
-            "mean_abs_shap": 0.00469
+            "mean_abs_shap": 0.005275
           },
           {
-            "feature": "Defendants_share_pro_se",
-            "mean_abs_shap": 0.003988
+            "feature": "plaintiffs_count",
+            "mean_abs_shap": 0.004246
           }
         ]
       }
     },
-    "B_vs_A_mae_improvement": 0.003018,
-    "C_vs_B_mae_improvement": -0.003613,
-    "C_vs_A_mae_improvement": -0.000595
+    "B_vs_A_mae_improvement": 0.002653,
+    "C_vs_B_mae_improvement": -0.002691,
+    "C_vs_A_mae_improvement": -3.8e-05
   },
   "cr": {
     "case_type": "cr",
     "target": "ed",
     "models": {
       "A": {
-        "mae": 0.147694,
-        "r2": 0.534476,
+        "mae": 0.147551,
+        "r2": 0.532644,
         "n_train": 13157,
         "n_test": 3290,
         "n_features": 18,
@@ -313,59 +313,59 @@
         "shap_top15": [
           {
             "feature": "Defendants_pending_counts",
-            "mean_abs_shap": 0.093865
+            "mean_abs_shap": 0.09029
           },
           {
             "feature": "Defendants_counsels_count",
-            "mean_abs_shap": 0.061122
+            "mean_abs_shap": 0.060264
           },
           {
             "feature": "plaintiffs_counsels_count",
-            "mean_abs_shap": 0.057354
+            "mean_abs_shap": 0.058073
           },
           {
             "feature": "Other_courts",
-            "mean_abs_shap": 0.041784
+            "mean_abs_shap": 0.042777
           },
           {
             "feature": "Magistrate_Judge",
-            "mean_abs_shap": 0.019406
+            "mean_abs_shap": 0.02028
           },
           {
             "feature": "Defendants_share_pro_se",
-            "mean_abs_shap": 0.005943
+            "mean_abs_shap": 0.005832
           },
           {
             "feature": "city_Chicago",
-            "mean_abs_shap": 0.004854
+            "mean_abs_shap": 0.00499
           },
           {
             "feature": "Defendants_count",
-            "mean_abs_shap": 0.002784
+            "mean_abs_shap": 0.003275
           },
           {
             "feature": "Defendants_share_ind",
-            "mean_abs_shap": 0.001617
-          },
-          {
-            "feature": "city_Rockford",
-            "mean_abs_shap": 0.000885
-          },
-          {
-            "feature": "Defendants_share_pro_hac_vice",
-            "mean_abs_shap": 0.000136
+            "mean_abs_shap": 0.002021
           },
           {
             "feature": "plaintiffs_share_pro_hac_vice",
-            "mean_abs_shap": 0.000116
+            "mean_abs_shap": 0.001586
           },
           {
-            "feature": "plaintiffs_count",
-            "mean_abs_shap": 4.8e-05
+            "feature": "city_Rockford",
+            "mean_abs_shap": 0.001161
+          },
+          {
+            "feature": "Defendants_share_pro_hac_vice",
+            "mean_abs_shap": 0.000395
           },
           {
             "feature": "plaintiffs_share_ind",
-            "mean_abs_shap": 4.1e-05
+            "mean_abs_shap": 0.000145
+          },
+          {
+            "feature": "plaintiffs_count",
+            "mean_abs_shap": 0.000124
           },
           {
             "feature": "is_mdl",
@@ -374,8 +374,8 @@
         ]
       },
       "B": {
-        "mae": 0.143961,
-        "r2": 0.550477,
+        "mae": 0.14473,
+        "r2": 0.536175,
         "n_train": 13157,
         "n_test": 3290,
         "n_features": 19,
@@ -398,74 +398,74 @@
           "plaintiffs_share_pro_hac_vice",
           "plaintiffs_share_pro_se",
           "related_case_count",
-          "District_Judge_idx"
+          "District_Judge"
         ],
         "shap_top15": [
           {
             "feature": "Defendants_pending_counts",
-            "mean_abs_shap": 0.088766
+            "mean_abs_shap": 0.088289
           },
           {
             "feature": "Defendants_counsels_count",
-            "mean_abs_shap": 0.057719
+            "mean_abs_shap": 0.056125
           },
           {
-            "feature": "District_Judge_idx",
-            "mean_abs_shap": 0.04714
+            "feature": "District_Judge",
+            "mean_abs_shap": 0.054813
           },
           {
             "feature": "plaintiffs_counsels_count",
-            "mean_abs_shap": 0.046804
+            "mean_abs_shap": 0.046327
           },
           {
             "feature": "Other_courts",
-            "mean_abs_shap": 0.040887
+            "mean_abs_shap": 0.043742
           },
           {
             "feature": "Magistrate_Judge",
-            "mean_abs_shap": 0.010395
-          },
-          {
-            "feature": "city_Chicago",
-            "mean_abs_shap": 0.005767
+            "mean_abs_shap": 0.012363
           },
           {
             "feature": "Defendants_share_pro_se",
-            "mean_abs_shap": 0.005324
+            "mean_abs_shap": 0.005232
+          },
+          {
+            "feature": "city_Chicago",
+            "mean_abs_shap": 0.004933
           },
           {
             "feature": "Defendants_count",
-            "mean_abs_shap": 0.003679
+            "mean_abs_shap": 0.003821
           },
           {
             "feature": "Defendants_share_ind",
-            "mean_abs_shap": 0.001756
+            "mean_abs_shap": 0.002223
           },
           {
             "feature": "city_Rockford",
-            "mean_abs_shap": 0.001626
-          },
-          {
-            "feature": "Defendants_share_pro_hac_vice",
-            "mean_abs_shap": 9.1e-05
-          },
-          {
-            "feature": "plaintiffs_share_ind",
-            "mean_abs_shap": 3.9e-05
-          },
-          {
-            "feature": "plaintiffs_count",
-            "mean_abs_shap": 2.3e-05
+            "mean_abs_shap": 0.00121
           },
           {
             "feature": "plaintiffs_share_pro_hac_vice",
-            "mean_abs_shap": 1.7e-05
+            "mean_abs_shap": 0.000725
+          },
+          {
+            "feature": "Defendants_share_pro_hac_vice",
+            "mean_abs_shap": 0.000292
+          },
+          {
+            "feature": "plaintiffs_share_ind",
+            "mean_abs_shap": 0.000178
+          },
+          {
+            "feature": "plaintiffs_count",
+            "mean_abs_shap": 5.2e-05
           }
         ]
       },
       "C": {
-        "mae": 0.150443,
-        "r2": 0.512021,
+        "mae": 0.151336,
+        "r2": 0.50363,
         "n_train": 13157,
         "n_test": 3290,
         "n_features": 22,
@@ -488,7 +488,7 @@
           "plaintiffs_share_pro_hac_vice",
           "plaintiffs_share_pro_se",
           "related_case_count",
-          "District_Judge_idx",
+          "District_Judge",
           "judge_open_at_filing",
           "judge_opened_30d",
           "judge_closed_30d"
@@ -496,69 +496,69 @@
         "shap_top15": [
           {
             "feature": "Defendants_pending_counts",
-            "mean_abs_shap": 0.085859
+            "mean_abs_shap": 0.082847
           },
           {
             "feature": "Defendants_counsels_count",
-            "mean_abs_shap": 0.060118
+            "mean_abs_shap": 0.060196
           },
           {
             "feature": "plaintiffs_counsels_count",
-            "mean_abs_shap": 0.050759
-          },
-          {
-            "feature": "Other_courts",
-            "mean_abs_shap": 0.03425
+            "mean_abs_shap": 0.05322
           },
           {
             "feature": "judge_open_at_filing",
-            "mean_abs_shap": 0.031851
+            "mean_abs_shap": 0.036632
           },
           {
-            "feature": "District_Judge_idx",
-            "mean_abs_shap": 0.021472
+            "feature": "Other_courts",
+            "mean_abs_shap": 0.035527
           },
           {
-            "feature": "judge_opened_30d",
-            "mean_abs_shap": 0.012273
+            "feature": "District_Judge",
+            "mean_abs_shap": 0.030968
           },
           {
             "feature": "Magistrate_Judge",
-            "mean_abs_shap": 0.01206
+            "mean_abs_shap": 0.016392
+          },
+          {
+            "feature": "judge_opened_30d",
+            "mean_abs_shap": 0.012376
           },
           {
             "feature": "judge_closed_30d",
-            "mean_abs_shap": 0.010499
-          },
-          {
-            "feature": "city_Chicago",
-            "mean_abs_shap": 0.005529
+            "mean_abs_shap": 0.011573
           },
           {
             "feature": "Defendants_share_pro_se",
-            "mean_abs_shap": 0.005499
+            "mean_abs_shap": 0.005312
+          },
+          {
+            "feature": "city_Chicago",
+            "mean_abs_shap": 0.004947
           },
           {
             "feature": "Defendants_count",
-            "mean_abs_shap": 0.002175
+            "mean_abs_shap": 0.002373
           },
           {
             "feature": "city_Rockford",
-            "mean_abs_shap": 0.002018
+            "mean_abs_shap": 0.00194
           },
           {
             "feature": "Defendants_share_ind",
-            "mean_abs_shap": 0.001853
+            "mean_abs_shap": 0.001751
           },
           {
-            "feature": "Defendants_share_pro_hac_vice",
-            "mean_abs_shap": 0.000118
+            "feature": "plaintiffs_share_pro_hac_vice",
+            "mean_abs_shap": 0.000731
           }
         ]
       }
     },
-    "B_vs_A_mae_improvement": 0.003733,
-    "C_vs_B_mae_improvement": -0.006482,
-    "C_vs_A_mae_improvement": -0.002749
+    "B_vs_A_mae_improvement": 0.002821,
+    "C_vs_B_mae_improvement": -0.006606,
+    "C_vs_A_mae_improvement": -0.003785
   }
 }

@@ -45,7 +45,18 @@ FIXED = dict(
     random_state=42,
     n_jobs=-1,
     tree_method="hist",
+    enable_categorical=True,
 )
+
+# District_Judge is a nominal id → native XGBoost categorical (see run_xgb.py).
+CATEGORICAL_COLS = ["District_Judge"]
+
+
+def _as_categorical(df):
+    for col in CATEGORICAL_COLS:
+        if col in df.columns:
+            df[col] = df[col].astype("category")
+    return df
 
 
 def _cv_mae(params: dict, X_train, y_train, n_splits: int = 3) -> float:
@@ -68,7 +79,7 @@ def main():
                         help="Case type to tune on (default: cv — largest set)")
     args = parser.parse_args()
 
-    df = load_dataset()
+    df = _as_categorical(load_dataset())
     # Tune on Model C (richest feature set) — best params generalise to A and B
     X_train, X_test, y_train, y_test = prepare(df, args.case_type, "C", target=TARGET)
 

@@ -3,15 +3,14 @@ Preprocessing for the 3-level model comparison.
 
 Feature sets:
   A — filing attributes only (no judge info)
-  B — filing attributes + District_Judge_idx (judge identity)
-  C — filing attributes + District_Judge_idx + judge workload features
+  B — filing attributes + District_Judge (judge identity)
+  C — filing attributes + District_Judge + judge workload features
 
 Usage:
   from src.preprocessing import load_dataset, prepare, get_feature_sets
 """
 from __future__ import annotations
 
-import json
 import sys
 from pathlib import Path
 
@@ -24,7 +23,6 @@ sys.path.insert(0, str(ROOT))
 from src.judge_workload import add_judge_workload
 
 PARQUET_PATH = ROOT / "data" / "by_case.parquet"
-LOOKUP_PATH  = ROOT / "data" / "district_judge_lookup.json"
 
 WORKLOAD_COLS = ["judge_open_at_filing", "judge_opened_30d", "judge_closed_30d"]
 
@@ -36,23 +34,19 @@ _NON_FEATURE = {
     "ucid",             # case identifier
     "case_open_date",   # temporal split + workload input
     "case_close_date",  # workload input
-    "District_Judge",   # intermediate string; reverse-mapped for workload only
     "n_events",         # target building block — leakage
     "n_activity_types", # target building block — leakage
     "year"         # derived from case_open_date
 }
 
 
-def load_dataset(parquet_path=None, lookup_path=None) -> pd.DataFrame:
+def load_dataset(parquet_path=None) -> pd.DataFrame:
     """
-    Load by_case.parquet, reverse-map District_Judge_idx → judge string,
-    parse dates, and compute judge workload features on the full dataset.
+    Load by_case.parquet, parse dates, and compute judge workload features on
+    the full dataset (District_Judge is the actual judge id; no lookup needed).
     Workload must be computed on ALL cases so peer counts are accurate.
     """
     df = pd.read_parquet(parquet_path or PARQUET_PATH).reset_index()
-
-    lookup = json.load(open(lookup_path or LOOKUP_PATH))
-    df["District_Judge"] = df["District_Judge_idx"].astype(str).map(lookup)
 
     df["case_open_date"]  = pd.to_datetime(df["case_open_date"])
     df["case_close_date"] = pd.to_datetime(df["case_close_date"])
@@ -77,12 +71,12 @@ def temporal_split(df: pd.DataFrame, test_ratio: float = 0.2):
 def get_feature_sets(df: pd.DataFrame) -> dict[str, list[str]]:
     """Return column lists for Model A, B, and C (target excluded from X)."""
     all_excluded = (_NON_FEATURE | {TARGET}
-                    | set(WORKLOAD_COLS) | {"District_Judge_idx"})
+                    | set(WORKLOAD_COLS) | {"District_Judge"})
     base_cols = sorted(c for c in df.columns if c not in all_excluded)
     return {
         "A": base_cols,
-        "B": base_cols + ["District_Judge_idx"],
-        "C": base_cols + ["District_Judge_idx"] + WORKLOAD_COLS,
+        "B": base_cols + ["District_Judge"],
+        "C": base_cols + ["District_Judge"] + WORKLOAD_COLS,
     }
 
 

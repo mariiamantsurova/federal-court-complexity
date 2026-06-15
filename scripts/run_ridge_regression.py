@@ -3,7 +3,7 @@
 Ridge Regression — Model A / B / C comparison for cv and cr case types.
 
 Model A: filing attributes only
-Model B: + District_Judge_idx  (judge identity)
+Model B: + District_Judge  (judge identity)
 Model C: + judge_open_at_filing, judge_opened_30d, judge_closed_30d  (workload)
 
 Ridge is a linear model, so each pipeline is:
@@ -30,11 +30,12 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import numpy as np
+from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import Ridge, RidgeCV
 from sklearn.metrics import mean_absolute_error, r2_score
 from sklearn.pipeline import Pipeline
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
@@ -48,6 +49,8 @@ FIGURES = ROOT / "reports" / "figures"
 
 # Log-spaced alpha grid for RidgeCV when --alpha is not supplied.
 ALPHA_GRID = np.logspace(-3, 4, 40)
+
+CATEGORICAL_COLS = ["District_Judge"]
 
 
 def _plot_mae_comparison(all_results: dict, path: Path):
@@ -118,10 +121,22 @@ def run_case_type(df, case_type: str, target: str, alpha: float | None) -> dict:
         else:
             regressor = Ridge(alpha=alpha)
 
+        # Numeric features: median-impute + standardize. Nominal id columns
+        # (District_Judge) are one-hot encoded instead — handle_unknown
+        # ignores judges that appear only in the newer test split.
+        cat_cols = [c for c in CATEGORICAL_COLS if c in X_train.columns]
+        num_cols = [c for c in X_train.columns if c not in cat_cols]
+        preprocessor = ColumnTransformer([
+            ("num", Pipeline([
+                ("impute", SimpleImputer(strategy="median")),
+                ("scale",  StandardScaler()),
+            ]), num_cols),
+            ("cat", OneHotEncoder(handle_unknown="ignore"), cat_cols),
+        ])
+
         model = Pipeline([
-            ("impute", SimpleImputer(strategy="median")),
-            ("scale",  StandardScaler()),
-            ("ridge",  regressor),
+            ("prep",  preprocessor),
+            ("ridge", regressor),
         ])
         model.fit(X_train, y_train)
 
@@ -132,10 +147,14 @@ def run_case_type(df, case_type: str, target: str, alpha: float | None) -> dict:
         mae = float(mean_absolute_error(y_test, y_pred))
         r2  = float(r2_score(y_test, y_pred))
 
-        # Standardized coefficients → comparable feature importance
+        # Coefficients → feature importance. Numeric features are standardized so
+        # their coefficients are comparable; one-hot judge dummies each get their
+        # own coefficient. Strip the ColumnTransformer's num__/cat__ prefixes.
+        feat_names = [n.split("__", 1)[-1]
+                      for n in model.named_steps["prep"].get_feature_names_out()]
         coefs = ridge.coef_
         top15 = sorted(
-            zip(X_test.columns.tolist(), coefs.tolist()),
+            zip(feat_names, coefs.tolist()),
             key=lambda x: abs(x[1]), reverse=True
         )[:15]
 

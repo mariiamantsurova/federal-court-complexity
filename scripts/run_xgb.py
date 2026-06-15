@@ -3,7 +3,7 @@
 XGBoost — Model A / B / C comparison for cv and cr case types.
 
 Model A: filing attributes only  (no judge info)
-Model B: + District_Judge_idx    (judge identity)
+Model B: + District_Judge   (judge identity)
 Model C: + judge workload cols   (judge_open_at_filing, judge_opened_30d, judge_closed_30d)
 
 Loads tuned hyperparameters from docs/xgb_best_params.json if present
@@ -59,7 +59,18 @@ DEFAULT_PARAMS = dict(
     random_state=42,
     n_jobs=-1,
     tree_method="hist",
+    enable_categorical=True,
 )
+
+CATEGORICAL_COLS = ["District_Judge"]
+
+
+def _as_categorical(df):
+    """Cast categorical id columns on the full frame so train/test share codes."""
+    for col in CATEGORICAL_COLS:
+        if col in df.columns:
+            df[col] = df[col].astype("category")
+    return df
 
 
 def _load_params(target: str) -> dict:
@@ -67,7 +78,8 @@ def _load_params(target: str) -> dict:
     if params_path.exists():
         data = json.loads(params_path.read_text())
         tuned = {**data["fixed_params"], **data["best_params"],
-                 "random_state": 42, "n_jobs": -1, "tree_method": "hist"}
+                 "random_state": 42, "n_jobs": -1, "tree_method": "hist",
+                 "enable_categorical": True}
         print(f"Using tuned params from {params_path.name}  (cv_mae={data['best_cv_mae']:.5f})")
         return tuned
     print(f"No tuned params for target='{target}' — using defaults. "
@@ -236,7 +248,7 @@ def main():
     args = parser.parse_args()
 
     params = _load_params(TARGET)
-    df     = load_dataset()
+    df     = _as_categorical(load_dataset())
     types  = ["cv", "cr"] if args.case_type == "both" else [args.case_type]
 
     all_results = {}
