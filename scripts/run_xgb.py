@@ -71,7 +71,7 @@ def _load_params(target: str) -> dict:
         print(f"Using tuned params from {params_path.name}  (cv_mae={data['best_cv_mae']:.5f})")
         return tuned
     print(f"No tuned params for target='{target}' — using defaults. "
-          f"Run scripts/tune_xgb.py --target {target} first.")
+          f"Run scripts/tune_xgb.py first.")
     return DEFAULT_PARAMS
 
 

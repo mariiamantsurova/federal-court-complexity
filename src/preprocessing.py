@@ -15,6 +15,7 @@ import json
 import sys
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -26,7 +27,6 @@ PARQUET_PATH = ROOT / "data" / "by_case.parquet"
 LOOKUP_PATH  = ROOT / "data" / "district_judge_lookup.json"
 
 WORKLOAD_COLS = ["judge_open_at_filing", "judge_opened_30d", "judge_closed_30d"]
-
 
 # aggregated target, which would be a separate pipeline (see git history).
 TARGET = "ed"
@@ -59,8 +59,7 @@ def load_dataset(parquet_path=None, lookup_path=None) -> pd.DataFrame:
 
     print("Computing judge workload features (all cases)...")
     df = add_judge_workload(df)
-    df['case_open_date'] = 
-    df
+    df[WORKLOAD_COLS] = np.log1p(df[WORKLOAD_COLS])
     print(f"  Done. Workload columns: {WORKLOAD_COLS}")
 
     return df
