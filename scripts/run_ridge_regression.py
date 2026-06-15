@@ -50,7 +50,10 @@ FIGURES = ROOT / "reports" / "figures"
 # Log-spaced alpha grid for RidgeCV when --alpha is not supplied.
 ALPHA_GRID = np.logspace(-3, 4, 40)
 
-CATEGORICAL_COLS = ["District_Judge"]
+# Nominal id columns one-hot encoded for the linear model (a single numeric
+# column would assume complexity is linear in an arbitrary id). nature_suit_idx
+# is in all of A/B/C, so this changes every model level, not just B/C.
+CATEGORICAL_COLS = ["District_Judge", "nature_suit_idx"]
 
 
 def _plot_mae_comparison(all_results: dict, path: Path):
