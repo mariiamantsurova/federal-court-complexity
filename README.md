@@ -1,5 +1,6 @@
 # Federal Court Complexity
-[![Uploading image.png…]()](https://www.pikpng.com/pngl/b/328-3288944_tel-aviv-university-logo-clipart.png)
+![Tel Aviv University](https://www.pikpng.com/pngl/b/328-3288944_tel-aviv-university-logo-clipart.png)
+
 
 
 **Does dynamic judge workload at case opening predict the *procedural complexity* of a case, beyond what basic case-filing attributes already explain?**
