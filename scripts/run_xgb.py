@@ -1,10 +1,15 @@
 #!/usr/bin/env python3
 """
-XGBoost — Model A / B / C comparison for cv and cr case types.
+XGBoost — Model 1 / 2 / 3 / 4 comparison for cv and cr case types.
 
-Model A: filing attributes only  (no judge info)
-Model B: + District_Judge   (judge identity)
-Model C: + judge workload cols   (judge_open_at_filing, judge_opened_30d, judge_closed_30d)
+Model 1: filing attributes only  (no judge info)
+Model 2: + judge workload cols    (workload, no judge identity)
+Model 3: + District_Judge         (judge identity, no workload)
+Model 4: + District_Judge + judge workload cols
+
+Workload cols: open_cases_at_filing, aged_open_cases_at_filing,
+clearance_rate_last_180_days. Models 2 and 4 isolate the workload signal with and
+without judge identity.
 
 Loads tuned hyperparameters from docs/xgb_best_params.json if present
 (run scripts/tune_xgb.py first to generate them).
@@ -18,9 +23,10 @@ Outputs (docs/):
   xgb_results.json
 
 Outputs (reports/figures/):
-  xgb_mae_comparison.png          — A/B/C MAE grouped bar chart (cv + cr)
-  xgb_shap_beeswarm_{ct}.png      — SHAP beeswarm, Model C
-  xgb_scatter_{ct}.png            — Actual vs Predicted, Model C
+  xgb_mae_comparison.png          — Model 1-4 MAE grouped bar chart (cv + cr)
+  xgb_shap_beeswarm_{ct}.png      — SHAP beeswarm, Model 4
+  xgb_shap_charts_{ct}.png        — SHAP importance bar charts, Models 1-4 in one figure
+  xgb_scatter_{ct}.png            — Actual vs Predicted, Model 4
 """
 from __future__ import annotations
 
@@ -64,6 +70,11 @@ DEFAULT_PARAMS = dict(
 
 CATEGORICAL_COLS = ["District_Judge"]
 
+LEVELS       = ["1", "2", "3", "4"]
+LEVEL_LABELS = ["Model 1\n(case only)", "Model 2\n(+ workload)",
+                "Model 3\n(+ judge ID)", "Model 4\n(+ both)"]
+RICHEST      = "4"   # full model used for SHAP / scatter
+
 
 def _as_categorical(df):
     """Cast categorical id columns on the full frame so train/test share codes."""
@@ -98,6 +109,41 @@ def _plot_beeswarm(sv, title: str, path: Path):
     plt.close(fig)
 
 
+def _plot_shap_charts_grid(shap_by_level: dict, case_type: str, target: str,
+                           path: Path, top_n: int = 12):
+    """2x2 grid of mean|SHAP| bar charts, one panel per Model 1-4.
+
+    shap_by_level maps level -> list of (feature, mean_abs_shap) sorted desc.
+    Each model has its own feature set, so panels are plotted independently
+    rather than as a shared grouped bar chart.
+    """
+    colors = {"1": "#2980b9", "2": "#27ae60", "3": "#8e44ad", "4": "#e67e22"}
+
+    fig, axes = plt.subplots(2, 2, figsize=(15, 11))
+    for level, ax, label in zip(LEVELS, axes.flat, LEVEL_LABELS):
+        feats_vals = shap_by_level[level][:top_n]
+        # barh draws bottom-up, so reverse to put the largest bar on top.
+        feats = [f for f, _ in feats_vals][::-1]
+        vals  = [v for _, v in feats_vals][::-1]
+
+        bars = ax.barh(feats, vals, color=colors[level], alpha=0.85)
+        vmax = max(vals) if vals else 1.0
+        for bar, v in zip(bars, vals):
+            ax.text(bar.get_width() + vmax * 0.01, bar.get_y() + bar.get_height() / 2,
+                    f"{v:.3f}", va="center", ha="left", fontsize=8)
+
+        ax.set_title(label.replace("\n", " "), fontsize=11, fontweight="bold")
+        ax.set_xlabel("mean(|SHAP|)")
+        ax.set_xlim(0, vmax * 1.18)
+        ax.margins(y=0.01)
+
+    fig.suptitle(f"SHAP feature importance by model | {case_type.upper()} | {target}",
+                 fontsize=14, fontweight="bold")
+    plt.tight_layout(rect=(0, 0, 1, 0.97))
+    fig.savefig(path, dpi=150, bbox_inches="tight")
+    plt.close(fig)
+
+
 def _plot_scatter(y_true, y_pred, case_type: str, path: Path):
     fig, ax = plt.subplots(figsize=(6, 6))
     ax.scatter(y_true, y_pred, alpha=0.15, s=4, color="#2980b9", rasterized=True)
@@ -105,7 +151,7 @@ def _plot_scatter(y_true, y_pred, case_type: str, path: Path):
     ax.plot([lo, hi], [lo, hi], "r--", lw=1, label="perfect")
     ax.set_xlabel("Actual event density (ed)")
     ax.set_ylabel("Predicted event density (ed)")
-    ax.set_title(f"Actual vs Predicted — Model C | {case_type.upper()}")
+    ax.set_title(f"Actual vs Predicted — Model 4 | {case_type.upper()}")
     ax.legend()
     plt.tight_layout()
     fig.savefig(path, dpi=150)
@@ -113,23 +159,22 @@ def _plot_scatter(y_true, y_pred, case_type: str, path: Path):
 
 
 def _plot_mae_comparison(all_results: dict, path: Path):
-    """Grouped bar chart of MAE for A/B/C across case types."""
+    """Grouped bar chart of MAE for Models 1-4 across case types."""
     case_types = list(all_results.keys())
-    levels     = ["A", "B", "C"]
-    x          = np.arange(len(levels))
+    x          = np.arange(len(LEVELS))
     width      = 0.35
     colors     = ["#2980b9", "#e67e22"]
 
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(9, 5))
     for i, (ct, color) in enumerate(zip(case_types, colors)):
-        maes = [all_results[ct]["models"][lv]["mae"] for lv in levels]
+        maes = [all_results[ct]["models"][lv]["mae"] for lv in LEVELS]
         bars = ax.bar(x + i * width, maes, width, label=ct.upper(), color=color, alpha=0.85)
         for bar, v in zip(bars, maes):
             ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.0005,
                     f"{v:.4f}", ha="center", va="bottom", fontsize=8)
 
     ax.set_xticks(x + width / 2)
-    ax.set_xticklabels(["Model A\n(filing only)", "Model B\n(+ judge ID)", "Model C\n(+ workload)"])
+    ax.set_xticklabels(LEVEL_LABELS)
     ax.set_ylabel("MAE (lower is better)")
     ax.set_title("XGBoost: MAE by Model Level and Case Type")
     ax.legend()
@@ -139,15 +184,15 @@ def _plot_mae_comparison(all_results: dict, path: Path):
 
 
 def _plot_r2_waterfall(result: dict, path: Path):
-    """R² improvement waterfall A → B → C for one case type."""
+    """R² progression across Models 1-4 for one case type."""
     ct     = result["case_type"]
-    levels = ["A", "B", "C"]
-    r2s    = [result["models"][lv]["r2"] for lv in levels]
-    labels = ["Model A\n(filing only)", "Model B\n(+ judge ID)", "Model C\n(+ workload)"]
-    colors = ["#2980b9", "#27ae60" if r2s[1] >= r2s[0] else "#e74c3c",
-              "#27ae60" if r2s[2] >= r2s[1] else "#e74c3c"]
+    r2s    = [result["models"][lv]["r2"] for lv in LEVELS]
+    labels = LEVEL_LABELS
+    colors = ["#2980b9"] + [
+        "#27ae60" if r2s[i] >= r2s[i - 1] else "#e74c3c" for i in range(1, len(r2s))
+    ]
 
-    fig, ax = plt.subplots(figsize=(7, 4))
+    fig, ax = plt.subplots(figsize=(8, 4))
     bars = ax.bar(labels, r2s, color=colors, alpha=0.85, width=0.5)
     for bar, v in zip(bars, r2s):
         ax.text(bar.get_x() + bar.get_width() / 2, v + 0.003,
@@ -174,8 +219,9 @@ def run_case_type(df, case_type: str, params: dict, target: str) -> dict:
     feature_sets = get_feature_sets(df)
     preds        = {}
     y_test_vals  = None
+    shap_by_level = {}
 
-    for level in ["A", "B", "C"]:
+    for level in LEVELS:
         X_train, X_test, y_train, y_test = prepare(df, case_type, level, target=target)
 
         model = xgb.XGBRegressor(**params)
@@ -197,10 +243,11 @@ def run_case_type(df, case_type: str, params: dict, target: str) -> dict:
             zip(X_test.columns.tolist(), mean_abs.tolist()),
             key=lambda x: x[1], reverse=True
         )[:15]
+        shap_by_level[level] = top15
 
         FIGURES.mkdir(parents=True, exist_ok=True)
-        if level == "C":
-            _plot_beeswarm(sv, f"SHAP Beeswarm — Model C | {case_type.upper()} | {target}",
+        if level == RICHEST:
+            _plot_beeswarm(sv, f"SHAP Beeswarm — Model 4 | {case_type.upper()} | {target}",
                            FIGURES / f"xgb_shap_beeswarm_{target}_{case_type}.png")
 
         models_out[level] = {
@@ -215,26 +262,30 @@ def run_case_type(df, case_type: str, params: dict, target: str) -> dict:
         print(f"  Model {level}: MAE={mae:.4f}  R²={r2:.4f}  "
               f"(train={len(X_train):,}  test={len(X_test):,}  features={X_train.shape[1]})")
 
-    # Persist predictions for downstream analysis
-    DOCS.mkdir(parents=True, exist_ok=True)
-    np.savez(DOCS / f"xgb_predictions_{target}_{case_type}.npz",
-             y_test=y_test_vals, **{f"pred_{lv}": preds[lv] for lv in preds}) # type: ignore
-
-    _plot_scatter(y_test_vals, preds["C"], case_type,
+    _plot_scatter(y_test_vals, preds[RICHEST], case_type,
                   FIGURES / f"xgb_scatter_{target}_{case_type}.png")
+
+    # Combined SHAP importance charts for Models 1-4 in one figure.
+    _plot_shap_charts_grid(shap_by_level, case_type, target,
+                           FIGURES / f"xgb_shap_charts_{target}_{case_type}.png")
 
     m = models_out
     result = {
         "case_type": case_type,
         "target":    target,
         "models":    m,
-        "B_vs_A_mae_improvement": round(m["A"]["mae"] - m["B"]["mae"], 6),
-        "C_vs_B_mae_improvement": round(m["B"]["mae"] - m["C"]["mae"], 6),
-        "C_vs_A_mae_improvement": round(m["A"]["mae"] - m["C"]["mae"], 6),
+        # MAE reductions isolating each signal (positive = lower error)
+        "m2_vs_m1_mae_improvement": round(m["1"]["mae"] - m["2"]["mae"], 6),  # workload alone
+        "m3_vs_m1_mae_improvement": round(m["1"]["mae"] - m["3"]["mae"], 6),  # judge ID alone
+        "m4_vs_m3_mae_improvement": round(m["3"]["mae"] - m["4"]["mae"], 6),  # workload | judge ID
+        "m4_vs_m2_mae_improvement": round(m["2"]["mae"] - m["4"]["mae"], 6),  # judge ID | workload
+        "m4_vs_m1_mae_improvement": round(m["1"]["mae"] - m["4"]["mae"], 6),  # both
     }
-    print(f"  ΔB-A={result['B_vs_A_mae_improvement']:+.4f}  "
-          f"ΔC-B={result['C_vs_B_mae_improvement']:+.4f}  "
-          f"ΔC-A={result['C_vs_A_mae_improvement']:+.4f}")
+    print(f"  Δ2-1={result['m2_vs_m1_mae_improvement']:+.4f}  "
+          f"Δ3-1={result['m3_vs_m1_mae_improvement']:+.4f}  "
+          f"Δ4-3={result['m4_vs_m3_mae_improvement']:+.4f}  "
+          f"Δ4-2={result['m4_vs_m2_mae_improvement']:+.4f}  "
+          f"Δ4-1={result['m4_vs_m1_mae_improvement']:+.4f}")
 
     # R² waterfall
     _plot_r2_waterfall(result, FIGURES / f"xgb_r2_waterfall_{target}_{case_type}.png")

@@ -3,7 +3,7 @@
     "case_type": "cv",
     "target": "ed",
     "models": {
-      "A": {
+      "1": {
         "mae": 0.143982,
         "r2": 0.510322,
         "alpha": 5.878016,
@@ -92,7 +92,99 @@
           }
         ]
       },
-      "B": {
+      "2": {
+        "mae": 0.142819,
+        "r2": 0.516045,
+        "alpha": 5.878016,
+        "n_train": 121309,
+        "n_test": 30328,
+        "features": [
+          "Defendants_counsels_count",
+          "Defendants_count",
+          "Defendants_pending_counts",
+          "Defendants_share_ind",
+          "Defendants_share_pro_hac_vice",
+          "Defendants_share_pro_se",
+          "Magistrate_Judge",
+          "Other_courts",
+          "city_Chicago",
+          "city_Rockford",
+          "is_mdl",
+          "nature_suit_idx",
+          "plaintiffs_counsels_count",
+          "plaintiffs_count",
+          "plaintiffs_share_ind",
+          "plaintiffs_share_pro_hac_vice",
+          "plaintiffs_share_pro_se",
+          "related_case_count",
+          "open_cases_at_filing",
+          "aged_open_cases_at_filing",
+          "clearance_rate_last_180_days"
+        ],
+        "coef_top15": [
+          {
+            "feature": "nature_suit_idx_15",
+            "coef": 0.297447
+          },
+          {
+            "feature": "nature_suit_idx_52",
+            "coef": 0.280215
+          },
+          {
+            "feature": "nature_suit_idx_54",
+            "coef": 0.21573
+          },
+          {
+            "feature": "nature_suit_idx_53",
+            "coef": 0.200876
+          },
+          {
+            "feature": "nature_suit_idx_6",
+            "coef": 0.173996
+          },
+          {
+            "feature": "nature_suit_idx_23",
+            "coef": 0.153465
+          },
+          {
+            "feature": "nature_suit_idx_29",
+            "coef": 0.152629
+          },
+          {
+            "feature": "nature_suit_idx_51",
+            "coef": 0.147999
+          },
+          {
+            "feature": "Defendants_counsels_count",
+            "coef": -0.128076
+          },
+          {
+            "feature": "nature_suit_idx_28",
+            "coef": 0.124478
+          },
+          {
+            "feature": "nature_suit_idx_87",
+            "coef": -0.110523
+          },
+          {
+            "feature": "nature_suit_idx_47",
+            "coef": -0.110349
+          },
+          {
+            "feature": "nature_suit_idx_19",
+            "coef": 0.109898
+          },
+          {
+            "feature": "nature_suit_idx_44",
+            "coef": -0.107997
+          },
+          {
+            "feature": "nature_suit_idx_30",
+            "coef": 0.105669
+          }
+        ]
+      },
+      "3": {
         "mae": 0.140418,
         "r2": 0.5245,
         "alpha": 5.878016,
@@ -182,9 +274,9 @@
           }
         ]
       },
-      "C": {
-        "mae": 0.141852,
-        "r2": 0.521448,
+      "4": {
+        "mae": 0.139928,
+        "r2": 0.528844,
         "alpha": 5.878016,
         "n_train": 121309,
         "n_test": 30328,
@@ -208,83 +300,85 @@
           "plaintiffs_share_pro_se",
           "related_case_count",
           "District_Judge",
-          "judge_open_at_filing",
-          "judge_opened_30d",
-          "judge_closed_30d"
+          "open_cases_at_filing",
+          "aged_open_cases_at_filing",
+          "clearance_rate_last_180_days"
         ],
         "coef_top15": [
           {
             "feature": "nature_suit_idx_15",
-            "coef": 0.284601
+            "coef": 0.28142
           },
           {
             "feature": "nature_suit_idx_52",
-            "coef": 0.270618
+            "coef": 0.277117
           },
           {
             "feature": "nature_suit_idx_54",
-            "coef": 0.215545
+            "coef": 0.221692
           },
           {
             "feature": "nature_suit_idx_6",
-            "coef": 0.202215
+            "coef": 0.213427
           },
           {
             "feature": "nature_suit_idx_53",
-            "coef": 0.193335
-          },
-          {
-            "feature": "District_Judge_SJ000233",
-            "coef": 0.165579
-          },
-          {
-            "feature": "District_Judge_SJ000193",
-            "coef": 0.162757
-          },
-          {
-            "feature": "nature_suit_idx_51",
-            "coef": 0.155388
+            "coef": 0.201202
           },
           {
             "feature": "nature_suit_idx_29",
-            "coef": 0.14629
+            "coef": 0.14786
           },
           {
             "feature": "nature_suit_idx_23",
-            "coef": 0.144276
+            "coef": 0.145222
+          },
+          {
+            "feature": "District_Judge_SJ000193",
+            "coef": 0.14443
+          },
+          {
+            "feature": "nature_suit_idx_51",
+            "coef": 0.142689
+          },
+          {
+            "feature": "District_Judge_SJ000233",
+            "coef": 0.127607
           },
           {
             "feature": "Defendants_counsels_count",
-            "coef": -0.125727
+            "coef": -0.126483
           },
           {
             "feature": "nature_suit_idx_28",
-            "coef": 0.123798
-          },
-          {
-            "feature": "nature_suit_idx_47",
-            "coef": -0.114469
+            "coef": 0.124628
           },
           {
             "feature": "District_Judge_SJ000206",
-            "coef": 0.114001
+            "coef": 0.122824
           },
           {
-            "feature": "District_Judge_SJ001316",
-            "coef": -0.109583
+            "feature": "nature_suit_idx_19",
+            "coef": 0.109262
+          },
+          {
+            "feature": "nature_suit_idx_44",
+            "coef": -0.109073
           }
         ]
       }
     },
-    "B_vs_A_mae_improvement": 0.003564,
-    "C_vs_B_mae_improvement": -0.001434,
-    "C_vs_A_mae_improvement": 0.00213
+    "m2_vs_m1_mae_improvement": 0.001163,
+    "m3_vs_m1_mae_improvement": 0.003564,
+    "m4_vs_m3_mae_improvement": 0.00049,
+    "m4_vs_m2_mae_improvement": 0.002891,
+    "m4_vs_m1_mae_improvement": 0.004054
   },
   "cr": {
     "case_type": "cr",
     "target": "ed",
     "models": {
-      "A": {
+      "1": {
         "mae": 0.151908,
         "r2": 0.547923,
         "alpha": 13.433993,
@@ -373,7 +467,99 @@
           }
         ]
       },
-      "B": {
+      "2": {
+        "mae": 0.153812,
+        "r2": 0.540313,
+        "alpha": 20.309176,
+        "n_train": 13157,
+        "n_test": 3290,
+        "features": [
+          "Defendants_counsels_count",
+          "Defendants_count",
+          "Defendants_pending_counts",
+          "Defendants_share_ind",
+          "Defendants_share_pro_hac_vice",
+          "Defendants_share_pro_se",
+          "Magistrate_Judge",
+          "Other_courts",
+          "city_Chicago",
+          "city_Rockford",
+          "is_mdl",
+          "nature_suit_idx",
+          "plaintiffs_counsels_count",
+          "plaintiffs_count",
+          "plaintiffs_share_ind",
+          "plaintiffs_share_pro_hac_vice",
+          "plaintiffs_share_pro_se",
+          "related_case_count",
+          "open_cases_at_filing",
+          "aged_open_cases_at_filing",
+          "clearance_rate_last_180_days"
+        ],
+        "coef_top15": [
+          {
+            "feature": "Defendants_counsels_count",
+            "coef": -0.127663
+          },
+          {
+            "feature": "Defendants_pending_counts",
+            "coef": -0.068205
+          },
+          {
+            "feature": "plaintiffs_counsels_count",
+            "coef": -0.063762
+          },
+          {
+            "feature": "Defendants_count",
+            "coef": 0.060586
+          },
+          {
+            "feature": "Other_courts",
+            "coef": 0.056572
+          },
+          {
+            "feature": "aged_open_cases_at_filing",
+            "coef": 0.03093
+          },
+          {
+            "feature": "plaintiffs_count",
+            "coef": 0.016741
+          },
+          {
+            "feature": "Magistrate_Judge",
+            "coef": 0.014294
+          },
+          {
+            "feature": "clearance_rate_last_180_days",
+            "coef": -0.011188
+          },
+          {
+            "feature": "open_cases_at_filing",
+            "coef": 0.006048
+          },
+          {
+            "feature": "Defendants_share_pro_se",
+            "coef": -0.006002
+          },
+          {
+            "feature": "Defendants_share_ind",
+            "coef": 0.0035
+          },
+          {
+            "feature": "plaintiffs_share_ind",
+            "coef": -0.002725
+          },
+          {
+            "feature": "city_Chicago",
+            "coef": -0.001425
+          },
+          {
+            "feature": "city_Rockford",
+            "coef": 0.001425
+          }
+        ]
+      },
+      "3": {
         "mae": 0.153659,
         "r2": 0.535917,
         "alpha": 20.309176,
@@ -463,9 +649,9 @@
           }
         ]
       },
-      "C": {
-        "mae": 0.155226,
-        "r2": 0.530215,
+      "4": {
+        "mae": 0.155162,
+        "r2": 0.530976,
         "alpha": 20.309176,
         "n_train": 13157,
         "n_test": 3290,
@@ -489,76 +675,78 @@
           "plaintiffs_share_pro_se",
           "related_case_count",
           "District_Judge",
-          "judge_open_at_filing",
-          "judge_opened_30d",
-          "judge_closed_30d"
+          "open_cases_at_filing",
+          "aged_open_cases_at_filing",
+          "clearance_rate_last_180_days"
         ],
         "coef_top15": [
           {
-            "feature": "District_Judge_Unknown",
-            "coef": 0.128888
+            "feature": "Defendants_counsels_count",
+            "coef": -0.127309
           },
           {
-            "feature": "Defendants_counsels_count",
-            "coef": -0.127999
+            "feature": "District_Judge_Unknown",
+            "coef": 0.124319
           },
           {
             "feature": "District_Judge_SJ000233",
-            "coef": -0.090181
+            "coef": -0.079301
           },
           {
             "feature": "District_Judge_SJ000193",
-            "coef": -0.064597
+            "coef": -0.069814
           },
           {
             "feature": "Other_courts",
-            "coef": 0.062921
-          },
-          {
-            "feature": "Defendants_pending_counts",
-            "coef": -0.056042
-          },
-          {
-            "feature": "Defendants_count",
-            "coef": 0.054325
+            "coef": 0.060122
           },
           {
             "feature": "plaintiffs_counsels_count",
-            "coef": -0.05323
+            "coef": -0.057757
           },
           {
-            "feature": "District_Judge_SJ000257",
-            "coef": 0.039241
+            "feature": "Defendants_pending_counts",
+            "coef": -0.055283
+          },
+          {
+            "feature": "Defendants_count",
+            "coef": 0.055015
           },
           {
             "feature": "District_Judge_SJ000250",
-            "coef": 0.03912
-          },
-          {
-            "feature": "District_Judge_SJ000218",
-            "coef": -0.037174
-          },
-          {
-            "feature": "District_Judge_SJ000212",
-            "coef": -0.032365
-          },
-          {
-            "feature": "District_Judge_SJ000244",
-            "coef": 0.027868
+            "coef": 0.049497
           },
           {
             "feature": "District_Judge_SJ000205",
-            "coef": 0.025502
+            "coef": 0.041118
+          },
+          {
+            "feature": "District_Judge_SJ000218",
+            "coef": -0.041071
+          },
+          {
+            "feature": "District_Judge_SJ000257",
+            "coef": 0.037973
+          },
+          {
+            "feature": "aged_open_cases_at_filing",
+            "coef": 0.032849
           },
           {
             "feature": "District_Judge_SJ000179",
-            "coef": -0.025209
+            "coef": -0.028457
+          },
+          {
+            "feature": "District_Judge_SJ000204",
+            "coef": 0.028057
           }
         ]
       }
     },
-    "B_vs_A_mae_improvement": -0.001751,
-    "C_vs_B_mae_improvement": -0.001567,
-    "C_vs_A_mae_improvement": -0.003318
+    "m2_vs_m1_mae_improvement": -0.001904,
+    "m3_vs_m1_mae_improvement": -0.001751,
+    "m4_vs_m3_mae_improvement": -0.001503,
+    "m4_vs_m2_mae_improvement": -0.00135,
+    "m4_vs_m1_mae_improvement": -0.003254
   }
 }

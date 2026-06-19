@@ -1,10 +1,14 @@
 """
-Preprocessing for the 3-level model comparison.
+Preprocessing for the 4-level model comparison.
 
 Feature sets:
-  A — filing attributes only (no judge info)
-  B — filing attributes + District_Judge (judge identity)
-  C — filing attributes + District_Judge + judge workload features
+  1 — filing attributes only (no judge info)
+  2 — filing attributes + judge workload features (no judge identity)
+  3 — filing attributes + District_Judge (judge identity)
+  4 — filing attributes + District_Judge + judge workload features
+
+Models 2 and 4 isolate the workload signal with and without judge identity, so
+its contribution can be attributed independently of who the judge is.
 
 Usage:
   from src.preprocessing import load_dataset, prepare, get_feature_sets
@@ -24,7 +28,9 @@ from src.judge_workload import add_judge_workload
 
 PARQUET_PATH = ROOT / "data" / "by_case.parquet"
 
-WORKLOAD_COLS = ["judge_open_at_filing", "judge_opened_30d", "judge_closed_30d"]
+# Two count columns are log1p-transformed; clearance is a bounded ratio, left raw.
+WORKLOAD_COUNT_COLS = ["open_cases_at_filing", "aged_open_cases_at_filing"]
+WORKLOAD_COLS = WORKLOAD_COUNT_COLS + ["clearance_rate_last_180_days"]
 
 # aggregated target, which would be a separate pipeline (see git history).
 TARGET = "ed"
@@ -53,7 +59,8 @@ def load_dataset(parquet_path=None) -> pd.DataFrame:
 
     print("Computing judge workload features (all cases)...")
     df = add_judge_workload(df)
-    df[WORKLOAD_COLS] = np.log1p(df[WORKLOAD_COLS])
+    # Counts are right-skewed → log1p. The clearance ratio is already bounded.
+    df[WORKLOAD_COUNT_COLS] = np.log1p(df[WORKLOAD_COUNT_COLS])
     print(f"  Done. Workload columns: {WORKLOAD_COLS}")
 
     return df
@@ -69,14 +76,15 @@ def temporal_split(df: pd.DataFrame, test_ratio: float = 0.2):
 
 
 def get_feature_sets(df: pd.DataFrame) -> dict[str, list[str]]:
-    """Return column lists for Model A, B, and C (target excluded from X)."""
+    """Return column lists for Models 1-4 (target excluded from X)."""
     all_excluded = (_NON_FEATURE | {TARGET}
                     | set(WORKLOAD_COLS) | {"District_Judge"})
     base_cols = sorted(c for c in df.columns if c not in all_excluded)
     return {
-        "A": base_cols,
-        "B": base_cols + ["District_Judge"],
-        "C": base_cols + ["District_Judge"] + WORKLOAD_COLS,
+        "1": base_cols,
+        "2": base_cols + WORKLOAD_COLS,
+        "3": base_cols + ["District_Judge"],
+        "4": base_cols + ["District_Judge"] + WORKLOAD_COLS,
     }
 
 

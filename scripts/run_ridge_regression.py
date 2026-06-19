@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """
-Ridge Regression — Model A / B / C comparison for cv and cr case types.
+Ridge Regression — Model 1 / 2 / 3 / 4 comparison for cv and cr case types.
 
-Model A: filing attributes only
-Model B: + District_Judge  (judge identity)
-Model C: + judge_open_at_filing, judge_opened_30d, judge_closed_30d  (workload)
+Model 1: filing attributes only
+Model 2: + workload  (open_cases_at_filing, aged_open_cases_at_filing,
+         clearance_rate_last_180_days; no judge identity)
+Model 3: + District_Judge  (judge identity, no workload)
+Model 4: + District_Judge + workload
 
 Ridge is a linear model, so each pipeline is:
   median impute  →  standardize  →  Ridge(alpha)
@@ -55,25 +57,28 @@ ALPHA_GRID = np.logspace(-3, 4, 40)
 # is in all of A/B/C, so this changes every model level, not just B/C.
 CATEGORICAL_COLS = ["District_Judge", "nature_suit_idx"]
 
+LEVELS       = ["1", "2", "3", "4"]
+LEVEL_LABELS = ["Model 1\n(case only)", "Model 2\n(+ workload)",
+                "Model 3\n(+ judge ID)", "Model 4\n(+ both)"]
+
 
 def _plot_mae_comparison(all_results: dict, path: Path):
-    """Grouped bar chart of MAE for A/B/C across case types."""
+    """Grouped bar chart of MAE for Models 1-4 across case types."""
     case_types = list(all_results.keys())
-    levels     = ["A", "B", "C"]
-    x          = np.arange(len(levels))
+    x          = np.arange(len(LEVELS))
     width      = 0.35
     colors     = ["#2980b9", "#e67e22"]
 
-    fig, ax = plt.subplots(figsize=(8, 5))
+    fig, ax = plt.subplots(figsize=(9, 5))
     for i, (ct, color) in enumerate(zip(case_types, colors)):
-        maes = [all_results[ct]["models"][lv]["mae"] for lv in levels]
+        maes = [all_results[ct]["models"][lv]["mae"] for lv in LEVELS]
         bars = ax.bar(x + i * width, maes, width, label=ct.upper(), color=color, alpha=0.85)
         for bar, v in zip(bars, maes):
             ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.0005,
                     f"{v:.4f}", ha="center", va="bottom", fontsize=8)
 
     ax.set_xticks(x + width / 2)
-    ax.set_xticklabels(["Model A\n(filing only)", "Model B\n(+ judge ID)", "Model C\n(+ workload)"])
+    ax.set_xticklabels(LEVEL_LABELS)
     ax.set_ylabel("MAE (lower is better)")
     ax.set_title("Ridge Regression: MAE by Model Level and Case Type")
     ax.legend()
@@ -83,15 +88,15 @@ def _plot_mae_comparison(all_results: dict, path: Path):
 
 
 def _plot_r2_waterfall(result: dict, path: Path):
-    """R² improvement waterfall A → B → C for one case type."""
+    """R² progression across Models 1-4 for one case type."""
     ct     = result["case_type"]
-    levels = ["A", "B", "C"]
-    r2s    = [result["models"][lv]["r2"] for lv in levels]
-    labels = ["Model A\n(filing only)", "Model B\n(+ judge ID)", "Model C\n(+ workload)"]
-    colors = ["#2980b9", "#27ae60" if r2s[1] >= r2s[0] else "#e74c3c",
-              "#27ae60" if r2s[2] >= r2s[1] else "#e74c3c"]
+    r2s    = [result["models"][lv]["r2"] for lv in LEVELS]
+    labels = LEVEL_LABELS
+    colors = ["#2980b9"] + [
+        "#27ae60" if r2s[i] >= r2s[i - 1] else "#e74c3c" for i in range(1, len(r2s))
+    ]
 
-    fig, ax = plt.subplots(figsize=(7, 4))
+    fig, ax = plt.subplots(figsize=(8, 4))
     bars = ax.bar(labels, r2s, color=colors, alpha=0.85, width=0.5)
     for bar, v in zip(bars, r2s):
         ax.text(bar.get_x() + bar.get_width() / 2, v + 0.003,
@@ -116,7 +121,7 @@ def run_case_type(df, case_type: str, target: str, alpha: float | None) -> dict:
 
     feature_sets = get_feature_sets(df)
 
-    for level in ["A", "B", "C"]:
+    for level in LEVELS:
         X_train, X_test, y_train, y_test = prepare(df, case_type, level, target=target)
 
         if alpha is None:
@@ -180,13 +185,18 @@ def run_case_type(df, case_type: str, target: str, alpha: float | None) -> dict:
         "case_type": case_type,
         "target":    target,
         "models":    m,
-        "B_vs_A_mae_improvement": round(m["A"]["mae"] - m["B"]["mae"], 6),
-        "C_vs_B_mae_improvement": round(m["B"]["mae"] - m["C"]["mae"], 6),
-        "C_vs_A_mae_improvement": round(m["A"]["mae"] - m["C"]["mae"], 6),
+        # MAE reductions isolating each signal (positive = lower error)
+        "m2_vs_m1_mae_improvement": round(m["1"]["mae"] - m["2"]["mae"], 6),  # workload alone
+        "m3_vs_m1_mae_improvement": round(m["1"]["mae"] - m["3"]["mae"], 6),  # judge ID alone
+        "m4_vs_m3_mae_improvement": round(m["3"]["mae"] - m["4"]["mae"], 6),  # workload | judge ID
+        "m4_vs_m2_mae_improvement": round(m["2"]["mae"] - m["4"]["mae"], 6),  # judge ID | workload
+        "m4_vs_m1_mae_improvement": round(m["1"]["mae"] - m["4"]["mae"], 6),  # both
     }
-    print(f"  ΔB-A={result['B_vs_A_mae_improvement']:+.4f}  "
-          f"ΔC-B={result['C_vs_B_mae_improvement']:+.4f}  "
-          f"ΔC-A={result['C_vs_A_mae_improvement']:+.4f}")
+    print(f"  Δ2-1={result['m2_vs_m1_mae_improvement']:+.4f}  "
+          f"Δ3-1={result['m3_vs_m1_mae_improvement']:+.4f}  "
+          f"Δ4-3={result['m4_vs_m3_mae_improvement']:+.4f}  "
+          f"Δ4-2={result['m4_vs_m2_mae_improvement']:+.4f}  "
+          f"Δ4-1={result['m4_vs_m1_mae_improvement']:+.4f}")
 
     FIGURES.mkdir(parents=True, exist_ok=True)
     _plot_r2_waterfall(result, FIGURES / f"ridge_r2_waterfall_{target}_{case_type}.png")

@@ -2,7 +2,7 @@
 """
 Hyperparameter tuning for XGBoost via randomised search with TimeSeriesSplit.
 
-Tunes on Model C (all features) of the cv case type (largest split).
+Tunes on Model 4 (all features) of the cv case type (largest split).
 Best params are saved to docs/xgb_best_params_{target}.json and reused by run_xgb.py.
 
 Usage:
@@ -59,7 +59,7 @@ def _as_categorical(df):
     return df
 
 
-def _cv_mae(params: dict, X_train, y_train, n_splits: int = 3) -> float:
+def _cv_mae(params: dict, X_train, y_train, n_splits: int = 5) -> float:
     tscv = TimeSeriesSplit(n_splits=n_splits)
     maes = []
     for tr_idx, val_idx in tscv.split(X_train):
@@ -80,10 +80,10 @@ def main():
     args = parser.parse_args()
 
     df = _as_categorical(load_dataset())
-    # Tune on Model C (richest feature set) — best params generalise to A and B
-    X_train, X_test, y_train, y_test = prepare(df, args.case_type, "C", target=TARGET)
+    # Tune on Model 4 (richest feature set) — best params generalise to 1/2/3
+    X_train, X_test, y_train, y_test = prepare(df, args.case_type, "4", target=TARGET)
 
-    print(f"Tuning XGBoost on {args.case_type.upper()} Model C | target={TARGET} "
+    print(f"Tuning XGBoost on {args.case_type.upper()} Model 4 | target={TARGET} "
           f"({len(X_train):,} train rows, {X_train.shape[1]} features)")
     print(f"Running {args.n_iter} random combinations with 3-fold TimeSeriesSplit ...\n")
 
