@@ -112,8 +112,6 @@ docs/                  # model results (JSON, committed)
 reports/figures/       # generated figures
 ```
 
-See [CLAUDE.md](CLAUDE.md) for deeper architecture notes.
-
 ---
 
 ## Key finding
